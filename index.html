@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>KOMBO 技能升級模擬器</title>
+  <title>KOMBO 小遊戲</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* ===== 全局樣式 ===== */
@@ -25,6 +25,11 @@
     .kcoin {
       font-size: 24px;
       color: #004080;
+      margin-bottom: 10px;
+    }
+    .spent {
+      font-size: 18px;
+      color: #333;
       margin-bottom: 20px;
     }
 
@@ -49,6 +54,7 @@
     }
     #introModal ol {
       margin-left: 20px;
+      margin-bottom: 10px;
     }
     #introModal a {
       color: #0066cc;
@@ -88,7 +94,7 @@
       width: 50%;
       justify-content: flex-end;
     }
-    /* 升級按鈕：藍色 */
+    /* 升級按鈕：橘色 */
     .btn.upgrade {
       background: #FF7E00;
       color: white;
@@ -99,7 +105,7 @@
       width: 50%;
       font-size: 14px;
     }
-    /* 降級按鈕：橘色 */
+    /* 降級按鈕：藍色 */
     .btn.downgrade {
       background: #0066cc;
       color: white;
@@ -151,6 +157,7 @@
       text-align: center;
       position: relative;
       animation: fadeInModal 0.3s ease-out;
+      color: #333;
     }
     @keyframes fadeInModal {
       from { opacity: 0; transform: translateY(-20px); }
@@ -186,6 +193,103 @@
       cursor: pointer;
     }
 
+    /* ===== 小遊戲 Modal ===== */
+    #gameModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9997;
+      justify-content: center;
+      align-items: center;
+    }
+    #gameContent {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      width: 360px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      color: #333;
+    }
+    #gameContent h3 {
+      margin-bottom: 12px;
+      color: #D35400;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .grid-button {
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+      height: 80px;
+      overflow: hidden;
+    }
+    .grid-button.selected {
+      outline: 3px solid #FF7E00; /* 標示已選取 */
+    }
+    .grid-button.correct {
+      background: #c8e6c9; /* 綠色提示已選正確 */
+    }
+    .grid-button.wrong {
+      background: #ffcdd2; /* 紅色提示已選錯誤 */
+      cursor: default;
+    }
+    .grid-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #confirmBtn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #FF7E00;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #confirmBtn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #gameStatus {
+      font-size: 16px;
+      margin-top: 12px;
+    }
+    #followButtons {
+      margin-top: 10px;
+      display: none; /* 只有三關都答完才顯示 */
+    }
+    #followButtons button {
+      margin: 4px;
+      padding: 6px 12px;
+      background: #0066CC;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #exitGameBtn {
+      margin-top: 16px;
+      padding: 6px 12px;
+      background: #666;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
     /* ===== 下方所有符合條件的卡片：Flex 容器 ===== */
     .product-recommend {
       margin-top: 40px;
@@ -209,6 +313,7 @@
       flex: 1 1 280px;              /* 最小 280px 寬度，畫面寬度足夠時可放大 */
       text-align: center;
       animation: fadeIn 0.4s ease-out;
+      color: #333;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -272,51 +377,52 @@
     </div>
   </div>
 
-  <!-- ===== LOGO & K 幣 ===== -->
+  <!-- ===== LOGO & 已花費/剩餘 K 幣 ===== -->
   <img src="LOGO.jpg" class="logo" alt="KOMBO Logo">
-  <div class="kcoin">目前已花費 K幣：<span id="kcoin">450</span></div>
+  <div class="spent">已花費 K 幣：<span id="spent">450</span> 元</div>
+  <div class="kcoin">剩餘 K 幣：<span id="kcoin">0</span> 元</div>
 
   <!-- ===== 技能區 ===== -->
   <div class="skill-block">
     <div class="skill-name">手感</div>
     <div class="skill-level" id="lv-touch">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-touch" onclick="upgrade('touch')">升級（+10 K幣）</button>
-      <button class="btn downgrade" onclick="downgrade('touch')">降級（-10 K幣）</button>
+      <button class="btn upgrade" id="up-touch" onclick="upgrade('touch')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-touch" onclick="downgrade('touch')" disabled>降級（-10 元）</button>
     </div>
   </div>
   <div class="skill-block">
     <div class="skill-name">耐打</div>
     <div class="skill-level" id="lv-durability">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-durability" onclick="upgrade('durability')">升級（+10 K幣）</button>
-      <button class="btn downgrade" onclick="downgrade('durability')">降級（-10 K幣）</button>
+      <button class="btn upgrade" id="up-durability" onclick="upgrade('durability')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-durability" onclick="downgrade('durability')" disabled>降級（-10 元）</button>
     </div>
   </div>
   <div class="skill-block">
     <div class="skill-name">飛行</div>
     <div class="skill-level" id="lv-flight">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-flight" onclick="upgrade('flight')">升級（+10 K幣）</button>
-      <button class="btn downgrade" onclick="downgrade('flight')">降級（-10 K幣）</button>
+      <button class="btn upgrade" id="up-flight" onclick="upgrade('flight')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-flight" onclick="downgrade('flight')" disabled>降級（-10 元）</button>
     </div>
   </div>
   <div class="skill-block">
     <div class="skill-name">外觀</div>
     <div class="skill-level" id="lv-look">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-look" onclick="upgrade('look')">升級（+10 K幣）</button>
-      <button class="btn downgrade" onclick="downgrade('look')">降級（-10 K幣）</button>
+      <button class="btn upgrade" id="up-look" onclick="upgrade('look')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-look" onclick="downgrade('look')" disabled>降級（-10 元）</button>
     </div>
   </div>
 
   <!-- ===== 工具按鈕 ===== -->
   <div class="tools">
-    <button onclick="shareToInstagram()">📸 分享至 Instagram</button>
+    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（三關）</button>
     <button onclick="resetAll()">🔄 重置</button>
   </div>
 
-  <!-- ===== Modal 推薦彈窗 ===== -->
+  <!-- ===== 推薦彈窗 ===== -->
   <div class="modal-overlay" id="recommendModal">
     <div class="modal-content" id="modalContent">
       <h3>🎯 適合你的球：<span id="modalName"></span></h3>
@@ -333,6 +439,24 @@
     </div>
   </div>
 
+  <!-- ===== 小遊戲彈窗（共三關） ===== -->
+  <div id="gameModal">
+    <div id="gameContent">
+      <h3 id="gameTitle">關卡 1：選出 KOMBO 產品 （還剩 <span id="needCount">5</span> 個）</h3>
+      <div class="grid-container" id="gridContainer">
+        <!-- JS 會動態插入 3×3 的按鈕（圖片） -->
+      </div>
+      <button id="confirmBtn" onclick="confirmSelection()" disabled>確定</button>
+      <p id="gameStatus"></p>
+      <div id="followButtons">
+        <p>恭喜完成三關！還可額外加碼：</p>
+        <button id="igBtn" onclick="followIG()">追蹤 IG（+50 元）</button>
+        <button id="fbBtn" onclick="followFB()">按讚 FB（+50 元）</button>
+      </div>
+      <button id="exitGameBtn">✕ 離開遊戲</button>
+    </div>
+  </div>
+
   <!-- ===== 下方產品卡片區 ===== -->
   <div class="product-recommend" id="productDisplay">
     <!-- JS 會把所有符合條件的 <div class="product">…</div> 動態插入到這裡 -->
@@ -343,19 +467,19 @@
 
   <script>
     // ============== 全局狀態 ==============
-    let kcoin = 450;
+    let kcoin = 0;                     // 剩餘 K 幣，一開始為 0
+    let spent = 450;                   // 已花費 K 幣，一開始為 450
     const maxLevel = 5;
     const skills = { touch: 1, durability: 1, flight: 1, look: 1 };
-    const display = {
+    const displayLv = {
       touch: document.getElementById("lv-touch"),
       durability: document.getElementById("lv-durability"),
       flight: document.getElementById("lv-flight"),
       look: document.getElementById("lv-look")
     };
-    let soundOn = true;
 
-    // 記錄「已經彈過 Modal 的產品名稱」，避免重複彈窗
-    let hasShownModalFor = new Set();
+    let soundOn = true;
+    let hasShownModalFor = new Set();  // 紀錄已經彈過推薦 Modal 的產品
 
     // ===== 產品列表（由高價到低價排序） =====
     const products = [
@@ -447,19 +571,22 @@
 
     // ============== 升級／降級 ==============
     function upgrade(skill) {
-      // 如果技能未滿且 K 幣 ≥ 10，就可升 0.5 級，K 幣 +10
+      // 只要玩家剩餘 K 幣 ≥ 10、且技能尚未滿，就可以升 0.5 級，並扣 10 元，spent 加 10
       if (skills[skill] < maxLevel && kcoin >= 10) {
         skills[skill] += 0.5;
-        kcoin += 10;
+        kcoin -= 10;
+        spent += 10;
         playSound();
         updateDisplay(skill);
         saveState();
       }
     }
     function downgrade(skill) {
+      // 如果該技能大於 Lv.1，就可降 0.5 級，並退 10 元到剩餘 K 幣，spent 減 10
       if (skills[skill] > 1) {
         skills[skill] -= 0.5;
-        kcoin -= 10;
+        kcoin += 10;
+        spent -= 10;
         playSound();
         updateDisplay(skill);
         saveState();
@@ -468,77 +595,281 @@
 
     // ============== 更新畫面顯示 ==============
     function updateDisplay(skill) {
-      // 更新 K 幣數字
+      // 更新剩餘與已花費 K 幣
       document.getElementById("kcoin").textContent = kcoin;
+      document.getElementById("spent").textContent = spent;
+
       // 更新單一技能的等級文字
-      display[skill].textContent = (skills[skill] >= maxLevel) ? "已滿等" : ("Lv." + skills[skill]);
-      // 如果該技能已滿或 K 幣不足 10，就禁用對應的「升級」按鈕
+      displayLv[skill].textContent = (skills[skill] >= maxLevel) ? "已滿等" : ("Lv." + skills[skill]);
+
+      // 升級/降級按鈕是否可用
       document.getElementById("up-" + skill).disabled = (skills[skill] >= maxLevel || kcoin < 10);
-      // 每次更新都嘗試觸發 Modal 或渲染下方卡片
+      document.getElementById("down-" + skill).disabled = (skills[skill] <= 1);
+
+      // 每次更新都嘗試觸發推薦 Modal 或渲染下方卡片
       checkProductMatch();
     }
 
     // ============== 分享至 Instagram（或複製至剪貼簿） ==============
     function shareToInstagram() {
-      // 準備要分享的文字
-      const shareText = `我在 KOMBO 升級模擬器中點出了：\n手感 Lv.${skills.touch}、耐打 Lv.${skills.durability}、飛行 Lv.${skills.flight}、外觀 Lv.${skills.look}\n總共花費：${kcoin} K 幣！`;
-      // 如果瀏覽器支援 Web Share API，就直接呼叫
+      const shareText = `我在 KOMBO 升級模擬器中點出了：\n手感 Lv.${skills.touch}、耐打 Lv.${skills.durability}、飛行 Lv.${skills.flight}、外觀 Lv.${skills.look}\n總共已花費：${spent} 元，剩餘：${kcoin} 元！`;
       if (navigator.share) {
-        navigator.share({
-          title: "KOMBO 技能升級模擬器",
-          text: shareText
-        }).catch((err) => {
-          // 如果使用者取消分享或發生錯誤，就 fallback 複製
-          copyFallback();
-        });
+        navigator.share({ title: "KOMBO 技能升級模擬器", text: shareText })
+          .catch(() => copyFallback());
       } else {
-        // 不支援 Web Share，就 fallback 複製文字到剪貼簿
         copyFallback();
       }
-
-      // Fallback 的函式：把 shareText 複製到剪貼簿，並跳出提示
       function copyFallback() {
         navigator.clipboard.writeText(shareText).then(() => {
-          alert("已複製分享文字到剪貼簿，請貼到 Instagram 分享 😊");
+          alert("已複製分享文字到剪貼簿，請手動貼到 Instagram 😊");
         }).catch(() => {
-          alert("無法複製到剪貼簿，請手動將以下文字複製並貼至 Instagram：\n\n" + shareText);
+          alert("無法複製到剪貼簿，請手動複製以下文字：\n\n" + shareText);
         });
       }
     }
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
     function saveState() {
-      localStorage.setItem("kombo_skills", JSON.stringify({ kcoin, skills }));
+      localStorage.setItem("kombo_skills", JSON.stringify({ kcoin, spent, skills }));
     }
     function loadSaved() {
-      // 清空 localStorage，回到初始狀態
+      // 清空 localStorage，回到初始狀態：K 幣 0，已花費 450，技能 Lv.1
       localStorage.removeItem("kombo_skills");
-      kcoin = 450;
+      kcoin = 0;
+      spent = 450;
       skills.touch = skills.durability = skills.flight = skills.look = 1;
       for (let key in skills) {
-        updateDisplay(key);
+        displayLv[key].textContent = "Lv.1";
+        document.getElementById("up-" + key).disabled = true;
+        document.getElementById("down-" + key).disabled = true;
       }
-      hasShownModalFor.clear(); // 清除曾經彈過的產品記錄
-    }
-
-    // ▶ **新增 resetAll()：按下重置時呼叫 loadSaved()（並順便關閉 Modal）**
-    function resetAll() {
-      loadSaved();
-      // 如果 Modal 還在開，就先關閉
-      const modalOverlay = document.getElementById("recommendModal");
-      modalOverlay.style.display = "none";
-      // 重新渲染一下下方卡片
+      document.getElementById("kcoin").textContent = kcoin;
+      document.getElementById("spent").textContent = spent;
+      hasShownModalFor.clear();
       renderAllMatchingCards();
     }
 
-    // ============== 點擊「開始遊戲」按鈕後，隱藏彈窗 ==============
+    // ▶ **重置按鈕**：呼叫 loadSaved()，並關閉所有 Modal
+    function resetAll() {
+      loadSaved();
+      document.getElementById("recommendModal").style.display = "none";
+      document.getElementById("gameModal").style.display = "none";
+    }
+
+    // ============== 點擊「開始遊戲」按鈕後，隱藏 Intro 彈窗 ==============
     function startGame() {
-      alert("這是一場技能的試煉——出發吧，K大師！");
+      alert("這是一場技能的試煉——出發吧，K 大師！");
       document.getElementById("introModal").style.display = "none";
       loadSaved();
     }
 
-    // ============== Modal 彈窗與下方卡片邏輯 ==============
+    // ============== 小遊戲邏輯（共 三 關） ==============
+    const gameModal     = document.getElementById("gameModal");
+    const gridContainer = document.getElementById("gridContainer");
+    const gameTitle     = document.getElementById("gameTitle");
+    const gameStatus    = document.getElementById("gameStatus");
+    const confirmBtn    = document.getElementById("confirmBtn");
+    const followButtons = document.getElementById("followButtons");
+    const igBtn         = document.getElementById("igBtn");
+    const fbBtn         = document.getElementById("fbBtn");
+    const exitGameBtn   = document.getElementById("exitGameBtn");
+
+    let currentRound = 1;       // 現在第幾關 (1~3)
+    let selectedCount = 0;      // 當前玩家已選取的格子數 (最多 5)
+    let totalEarned = 0;        // 本次遊戲累積獲得多少 K 幣
+    let canFollowIG = true;     // 判斷是否已按過 IG
+    let canFollowFB = true;     // 判斷是否已按過 FB
+
+    // 各關的題目選項（9 個），其中 5 個正確。請自行替換 image 路徑
+    const roundsData = {
+      1: {
+        items: [
+          { label: "K7pro", isCorrect: true,  image: "K7PRO.jpg" },
+          { label: "Nike 球拍", isCorrect: false, image: "images/nike_racket.jpg" },
+          { label: "KC", isCorrect: true,  image: "KC.jpg" },
+          { label: "Adidas 球鞋", isCorrect: false, image: "images/adidas_shoes.jpg" },
+          { label: "K5", isCorrect: true,  image: "K5.jpg" },
+          { label: "Yonex 球桿", isCorrect: false, image: "images/yonex_rod.jpg" },
+          { label: "Li-Ning 鞋", isCorrect: false, image: "images/lining_shoes.jpg" },
+          { label: "K3", isCorrect: true,  image: "K3.jpg" },
+          { label: "K3A", isCorrect: true,  image: "K3A.jpg" }
+        ]
+      },
+      2: {
+        items: [
+          { label: "K3A", isCorrect: true,  image: "K3A.jpg" },
+          { label: "Puma 服飾", isCorrect: false, image: "images/puma_cloth.jpg" },
+          { label: "Yonex 羽球", isCorrect: false, image: "images/yonex_badminton.jpg" },
+          { label: "KC", isCorrect: true,  image: "KC.jpg" },
+          { label: "K5+", isCorrect: true,  image: "K5+.jpg" },
+          { label: "Mizuno 球鞋", isCorrect: false, image: "images/mizuno_shoes.jpg" },
+          { label: "K7pro", isCorrect: true, image: "K7PRO.jpg" },
+          { label: "K3", isCorrect: true,  image: "K3.jpg" },
+          { label: "Yonex 球拍", isCorrect: false,  image: "images/yonex_racket.jpg" }
+        ]
+      },
+      3: {
+        items: [
+          { label: "K5A", isCorrect: true,  image: "K5A.jpg" },
+          { label: "K5", isCorrect: true,  image: "K5.jpg" },
+          { label: "Adidas 球衣", isCorrect: false, image: "images/adidas_jersey.jpg" },
+          { label: "K3", isCorrect: true,  image: "K3.jpg" },
+          { label: "K3A", isCorrect: true,  image: "K3A.jpg" },
+          { label: "Yonex 球拍", isCorrect: false, image: "images/yonex_racket.jpg" },
+          { label: "KC", isCorrect: true, image: "KC.jpg" },
+          { label: "Nike 球鞋", isCorrect: false, image: "images/nike_shoes.jpg" },
+          { label: "Li-Ning 鞋", isCorrect: false,  image: "images/lining_shoes.jpg" }
+        ]
+      }
+    };
+
+    // 打開小遊戲：初始化第一關
+    function openGame() {
+      currentRound  = 1;
+      totalEarned   = 0;
+      canFollowIG   = true;
+      canFollowFB   = true;
+      igBtn.disabled = false;
+      fbBtn.disabled = false;
+      followButtons.style.display = "none";
+      setupRound(currentRound);
+      gameModal.style.display = "flex";
+    }
+
+    // 設定某一關的題目
+    function setupRound(roundNum) {
+      const data = roundsData[roundNum];
+      selectedCount = 0;
+      gameStatus.textContent = "";
+      confirmBtn.disabled = true; 
+      gameTitle.textContent = `關卡 ${roundNum}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
+      gridContainer.innerHTML = "";
+
+      // 將九個選項隨機打亂順序再渲染
+      const arr = [...data.items];
+      arr.sort(() => Math.random() - 0.5);
+
+      arr.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "grid-button";
+        btn.innerHTML = `<img src="${item.image}" alt="${item.label}">`;
+        btn.dataset.isCorrect = item.isCorrect;
+        btn.dataset.selected = "false";
+        btn.onclick = () => toggleSelect(btn, item.isCorrect);
+        gridContainer.appendChild(btn);
+      });
+    }
+
+    // 切換按鈕的「已選取」狀態
+    function toggleSelect(btn, isCorrect) {
+      if (btn.classList.contains("correct") || btn.classList.contains("wrong")) {
+        return; // 已揭曉的格子不能再選
+      }
+      const currentlySelected = btn.dataset.selected === "true";
+      if (!currentlySelected && selectedCount < 5) {
+        btn.classList.add("selected");
+        btn.dataset.selected = "true";
+        selectedCount++;
+      } else if (currentlySelected) {
+        btn.classList.remove("selected");
+        btn.dataset.selected = "false";
+        selectedCount--;
+      }
+      confirmBtn.disabled = (selectedCount < 5);
+      gameTitle.textContent = `關卡 ${currentRound}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
+    }
+
+    // 按下「確定」才揭曉本關答案並計分
+    function confirmSelection() {
+      const buttons = gridContainer.querySelectorAll(".grid-button");
+      let correctCountThisRound = 0;
+
+      buttons.forEach(btn => {
+        const isCorrect = (btn.dataset.isCorrect === "true");
+        const isSelected = (btn.dataset.selected === "true");
+        if (isCorrect) {
+          // 正確的格子標示綠色
+          btn.classList.add("correct");
+          if (isSelected) {
+            correctCountThisRound++;
+          }
+        } else {
+          // 錯誤的格子如果被選到，標示紅色
+          if (isSelected) {
+            btn.classList.add("wrong");
+          }
+        }
+        // 無論如何都不能再切換
+        btn.onclick = null;
+      });
+
+      const gain = correctCountThisRound * 20;
+      totalEarned += gain;
+      gameStatus.textContent = `本關你選對 ${correctCountThisRound} 個，獲得 ${gain} 元！`;
+
+      // 如果不是最後一關，在 1 秒後載入下一關
+      if (currentRound < 3) {
+        setTimeout(() => {
+          currentRound++;
+          setupRound(currentRound);
+        }, 1000);
+      } else {
+        // 第三關結束後，顯示追蹤按鈕
+        setTimeout(() => {
+          gameStatus.textContent = `三關結束！共獲得 ${totalEarned} 元。還可追蹤 IG/FB 各 +50 元`;
+          followButtons.style.display = "block";
+        }, 1000);
+      }
+      confirmBtn.disabled = true;
+    }
+
+    // IG 按鈕：只給一次 +50，並開新視窗到指定連結
+    function followIG() {
+      if (!canFollowIG) return;
+      canFollowIG = false;
+      igBtn.disabled = true;
+      totalEarned += 50;
+      window.open(
+        "https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr",
+        "_blank"
+      );
+      gameStatus.textContent = `已追蹤 IG！額外獲得 50 元，總共 ${totalEarned} 元`;
+    }
+
+    // FB 按鈕：只給一次 +50，並開新視窗到指定連結
+    function followFB() {
+      if (!canFollowFB) return;
+      canFollowFB = false;
+      fbBtn.disabled = true;
+      totalEarned += 50;
+      window.open(
+        "https://www.facebook.com/share/19ZXhbVjJw/?mibextid=wwXIfr",
+        "_blank"
+      );
+      gameStatus.textContent = `已按讚 FB！額外獲得 50 元，總共 ${totalEarned} 元`;
+    }
+
+    // 離開/關閉小遊戲
+    exitGameBtn.addEventListener("click", () => {
+      gameModal.style.display = "none";
+      // 將遊戲所得加到剩餘 K 幣，再更新畫面
+      kcoin += totalEarned;
+      document.getElementById("kcoin").textContent = kcoin;
+      enableUpgradeButtons();
+      renderAllMatchingCards();
+    });
+
+    // 只有當玩家剩餘 K 幣 ≥ 10、且技能還沒滿，才解鎖升級按鈕
+    function enableUpgradeButtons() {
+      for (let key in skills) {
+        const upBtn = document.getElementById("up-" + key);
+        const downBtn = document.getElementById("down-" + key);
+        upBtn.disabled   = !(kcoin >= 10 && skills[key] < maxLevel);
+        downBtn.disabled = (skills[key] <= 1);
+      }
+    }
+
+    // ============== Modal 推薦卡片邏輯 ==============
     const modalOverlay    = document.getElementById("recommendModal");
     const modalName       = document.getElementById("modalName");
     const modalImg        = document.getElementById("modalImg");
@@ -550,15 +881,14 @@
     const modalLook       = document.getElementById("modalLook");
     const closeModalBtn   = document.getElementById("closeModalBtn");
 
-    // 點擊「關閉 Modal」後，隱藏，但同時把下方卡片全部渲染出來
+    // 關閉推薦 Modal
     closeModalBtn.addEventListener("click", () => {
       modalOverlay.style.display = "none";
       renderAllMatchingCards();
     });
 
-    // 每次技能或 K 幣更新，都呼叫此函式來檢查是否要彈 Modal
+    // 每次技能或已花費 (spent) 更新，都檢查是否要彈推薦 Modal
     function checkProductMatch() {
-      // 只以「技能條件符合」來決定是否彈窗
       for (let prod of products) {
         const matchSkill = (
           skills.touch >= prod.touch &&
@@ -566,11 +896,11 @@
           skills.flight >= prod.flight &&
           skills.look >= prod.look
         );
-        if (matchSkill && !hasShownModalFor.has(prod.name)) {
-          // 標記此產品已經彈過一次 Modal，不要再重複彈
-          hasShownModalFor.add(prod.name);
+        // 只要 已花費 (spent) >= 售價，就顯示
+        const matchSpend = (spent >= prod.price);
 
-          // 填入 Modal 內容
+        if (matchSkill && !hasShownModalFor.has(prod.name)) {
+          hasShownModalFor.add(prod.name);
           modalName.textContent       = prod.name;
           modalImg.src                = prod.image;
           modalImg.alt                = prod.name;
@@ -580,14 +910,11 @@
           modalDurability.textContent = prod.durability;
           modalFlight.textContent     = prod.flight;
           modalLook.textContent       = prod.look;
-
-          // 顯示遮罩 + 彈窗
           modalOverlay.style.display = "flex";
-          return; // 只彈第一個符合技能條件的產品
+          return; // 只先彈第一個符合條件的推薦
         }
       }
-
-      // 沒有新的「須彈窗」產品，就渲染所有符合「技能 或 價格」條件的卡片
+      // 沒有新的「須彈窗」產品，就渲染所有符合「技能 或 已花費 ≥ 價格」的卡片
       renderAllMatchingCards();
     }
 
@@ -603,10 +930,10 @@
           skills.flight >= prod.flight &&
           skills.look >= prod.look
         );
-        const matchPrice = (kcoin >= prod.price);
+        const matchSpend = (spent >= prod.price);
 
-        // 下方卡片依然保留「技能門檻或價格門檻」其中之一即可顯示
-        if (matchSkill || matchPrice) {
+        // 卡片條件：技能門檻或 已花費 ≥ 價格 其中之一
+        if (matchSkill || matchSpend) {
           const cardHtml = `
             <div class="product">
               <h3>🎯 適合你的球：${prod.name}</h3>
@@ -628,7 +955,7 @@
       });
     }
 
-    // 畫面第一次載入時，先把狀態初始化，再檢查是否要彈 Modal / 渲染卡片
+    // 首次載入：初始化畫面
     window.addEventListener("DOMContentLoaded", () => {
       loadSaved();
       checkProductMatch();
