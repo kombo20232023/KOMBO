@@ -135,6 +135,25 @@
       font-size: 14px;
       cursor: pointer;
     }
+    .orange-btn {
+      background: #f60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .orange-title {
+      color: #f60;
+      font-weight: bold;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+.orange-btn:hover {
+  opacity: 0.9;
+}
 
     /* ===== Modal 推薦卡片彈窗 ===== */
     .modal-overlay {
@@ -353,30 +372,66 @@
     .product a:hover {
       opacity: 0.9;
     }
+    .center-text {
+      text-align: center;
+    }
+    .ig-share-btn {
+      background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af);
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    @media screen and (max-width: 480px) {
+      #cardArea {
+        transform: scale(0.8);
+        transform-origin: top center;
+      }
+    }
+
   </style>
 </head>
 <body>
-
-  <!-- ===== 開場彈窗 ===== -->
+  <!-- ===== 第一層 modal：開始遊戲提醒 ===== -->
   <div id="introModal">
     <div style="max-width:500px">
-      <h2>🎮 KOMBO 技能升級模擬器</h2>
+      <h2 class="center-text">🎮 KOMBO 慷柏體育 🎮</h2>
       <p><strong>遊玩前的注意事項：</strong></p>
       <ol style="margin-left:20px;">
-        <li>此評分系統僅供參考，為 KOMBO 的內部統計資料，不代表每位球友的實際使用感受，請帶著輕鬆的心情遊玩！</li>
-        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本或售價調整，初始金額也會有所變動。若小編來不及更新，還請大家見諒！</li>
+        <li>此評分系統僅供參考，為 KOMBO 內部統計資料，不代表每位球友的實際使用感受，請帶著<strong>輕鬆的心情遊玩</strong>！</li>
+        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本有調整，所有金額皆會有所變動。若小編來不及更新，還請大家見諒！</li>
       </ol>
-      <p>📩 有任何建議歡迎到  
-        <a href="https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr" target="_blank">
-          KOMBO IG
+      <p class="center-text">📩 小編不是本科生若有任何建議都歡迎  
+        <a href="https://lin.ee/syEA7iU" target="_blank">
+          官方Line
         </a> 私訊我們喔！
       </p>
       <div style="text-align:center; margin-top:20px;">
-        <button onclick="startGame()">同意</button>
+        <button onclick="showRuleModal()">同意</button>
       </div>
     </div>
   </div>
 
+  <!-- ===== 第二層 modal：開始遊戲提醒 ===== -->
+  <div id="ruleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 9998; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: left;">
+    <div style="max-width: 500px;">
+      <h2 class="orange-title center-text">🔥 創造屬於你的羽毛球 🔥</h2>
+      <p><strong>遊戲介紹：</strong></p>
+      <ol style="margin-left: 20px;">
+        <li>目前已經花費了$450K幣，只獲得Lv.1的羽毛球，遊玩小遊戲來獲取更多K幣，提升你的羽毛球技能吧!</li>
+      </ol>
+      <p class="center-text" style="font-weight: bold; font-size: 18px;">
+      這是一場技能的試煉——出發吧，K 大師！
+      </p>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="orange-btn" onclick="startGame()">開始遊戲</button>
+    </div>
+  </div>
+</div>
   <!-- ===== LOGO & 已花費/剩餘 K 幣 ===== -->
   <img src="LOGO.jpg" class="logo" alt="KOMBO Logo">
   <div class="spent">已花費 K 幣：<span id="spent">450</span> 元</div>
@@ -420,12 +475,142 @@
   <div class="tools">
     <button onclick="openGame()">▶ 玩遊戲賺 K 幣（三關）</button>
     <button onclick="resetAll()">🔄 重置</button>
+    <button class="ig-share-btn" onclick="shareToInstagram()">📤 分享技能卡到 IG
+    </button>
   </div>
 
+
+  <!-- ===== 產生技能卡區 ===== -->
+  <div id="skillCardSection" style="margin-top: 40px;">
+    <h2 class="orange-title">🧩 專屬技能卡</h2>
+    <div style="margin-bottom: 10px;">
+      <label>名字：<input type="text" id="playerName" placeholder="輸入名字"></label>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <label style="display: none;">選擇羽球筒顏色：
+  <input type="color" id="tubeColor" value="#000000">
+</label>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <label>技能條顏色：<input type="color" id="barColor" value="#0A574F"></label>
+    </div>
+    <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
+    <button class="tools" onclick="downloadSkillCard()">下載技能卡</button>
+    <div id="cardPreview" style="margin-top: 20px;"></div>
+  </div>
+
+  <script>
+ function generateSkillCard() {
+  const name = document.getElementById('playerName').value || 'XXXXXXXX';
+  const tubeColor = document.getElementById('tubeColor').value;
+  const barColor = document.getElementById('barColor').value;
+  const lv2width = lv => ((lv - 1) * 20 + 20) + '%';
+
+  const html = `
+    <div id="cardArea" style="
+      position: relative;
+      width: 320px;
+      aspect-ratio: 2/3;
+      background: url('羽球技能卡背景.png') no-repeat center center;
+      background-size: contain;
+      font-family: sans-serif;
+      margin: auto;
+      padding: 0;
+      box-sizing: border-box;
+    ">
+      <!-- 名字 -->
+      <div style="
+        position: absolute;
+        top: 36px;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 28px;
+      ">${name}</div>
+
+      <!-- 標題 -->
+      <div style="
+        position: absolute;
+        top: 78px;
+        width: 100%;
+        text-align: center;
+        font-size: 20px;
+      ">羽球技能卡</div>
+
+      <!-- 羽球筒顏色方塊 -->
+      <div style="
+        display: none;
+        position: absolute;
+        top: 152px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 100px;
+        background: ${tubeColor};
+        border-radius: 5px;
+      "></div>
+
+      <!-- 技能條 -->
+      <div style="
+        position: absolute;
+        top: 282px;
+        left: 40px;
+        right: 45px;
+        font-size: 14px;
+        line-height: 26px;
+        text-align: left;
+      ">
+        <div>手感</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;">
+          <div style="background: ${barColor}; width: ${lv2width(skills.touch)}; height: 100%; border-radius: 4px;"></div>
+        </div>
+
+        <div>耐打</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;">
+          <div style="background: ${barColor}; width: ${lv2width(skills.durability)}; height: 100%; border-radius: 4px;"></div>
+        </div>
+
+        <div>飛行</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;">
+          <div style="background: ${barColor}; width: ${lv2width(skills.flight)}; height: 100%; border-radius: 4px;"></div>
+        </div>
+
+        <div>外觀</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 2.5px;">
+          <div style="background: ${barColor}; width: ${lv2width(skills.look)}; height: 100%; border-radius: 4px;"></div>
+        </div>
+
+        <div style="font-weight:bold;">售價：$${spent} 元</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('cardPreview').innerHTML = html;
+}
+
+  </script>
+
+  <script>
+  function downloadSkillCard() {
+    html2canvas(document.getElementById('cardArea'), {
+      scale: 4 // 讓下載時畫質高（3200x4800）
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'KOMBO_技能卡.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <!-- ===== 推薦彈窗 ===== -->
   <div class="modal-overlay" id="recommendModal">
     <div class="modal-content" id="modalContent">
-      <h3>🎯 適合你的球：<span id="modalName"></span></h3>
+      <h3>🎯 適合您的球：<span id="modalName"></span></h3>
       <img id="modalImg" src="" alt="產品圖">
       <p id="modalDesc"></p>
       <p><strong>售價：</strong>$<span id="modalPrice"></span>/筒</p>
@@ -533,7 +718,7 @@
         touch: 4,
         durability: 3.5,
         flight: 3.5,
-        look: 2,
+        look: 3,
         image: "K5.jpg",
         desc: "選用毛桿Q彈、羽翼厚實的三、四級刺骨鴨，搭配特調膠水，使手感舒適不生硬，更不容易斷毛好控制，穩定飛行，是高性價比的首選。",
         link: "https://lin.ee/syEA7iU"
@@ -612,20 +797,21 @@
 
     // ============== 分享至 Instagram（或複製至剪貼簿） ==============
     function shareToInstagram() {
-      const shareText = `我在 KOMBO 升級模擬器中點出了：\n手感 Lv.${skills.touch}、耐打 Lv.${skills.durability}、飛行 Lv.${skills.flight}、外觀 Lv.${skills.look}\n總共已花費：${spent} 元，剩餘：${kcoin} 元！`;
-      if (navigator.share) {
-        navigator.share({ title: "KOMBO 技能升級模擬器", text: shareText })
-          .catch(() => copyFallback());
-      } else {
-        copyFallback();
+      const card = document.getElementById('cardArea');
+      if (!card) {
+        alert("請先點選「產生技能卡」再分享！");
+        return;
       }
-      function copyFallback() {
-        navigator.clipboard.writeText(shareText).then(() => {
-          alert("已複製分享文字到剪貼簿，請手動貼到 Instagram 😊");
-        }).catch(() => {
-          alert("無法複製到剪貼簿，請手動複製以下文字：\n\n" + shareText);
-        });
-      }
+
+      html2canvas(card, { scale: 4 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'KOMBO_技能卡.png';
+        link.href = canvas.toDataURL();
+        link.click();
+
+        // 顯示提醒
+        alert("已自動下載技能卡到相簿📸\n\n由於小編能力有限，無法直接開啟 IG，請您手動打開 Instagram，並選擇剛剛下載的圖片上傳分享，謝謝您 🧡");
+      });
     }
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
@@ -651,17 +837,40 @@
 
     // ▶ **重置按鈕**：呼叫 loadSaved()，並關閉所有 Modal
     function resetAll() {
-      loadSaved();
-      document.getElementById("recommendModal").style.display = "none";
-      document.getElementById("gameModal").style.display = "none";
+      // 將 spent 退還給 kcoin
+      kcoin += spent-450;
+      spent = 450;
+
+      // 重設技能為 Lv.1
+      skills.touch = skills.durability = skills.flight = skills.look = 1;
+
+      // 更新畫面
+      for (let key in skills) {
+        displayLv[key].textContent = "Lv.1";
+      }
+      document.getElementById("kcoin").textContent = kcoin;
+      document.getElementById("spent").textContent = spent;
+
+      enableUpgradeButtons();  // 重新啟用按鈕
+      checkProductMatch();     // 重新檢查推薦
+      saveState();             // 存入 localStorage
     }
+ 
+
 
     // ============== 點擊「開始遊戲」按鈕後，隱藏 Intro 彈窗 ==============
-    function startGame() {
-      alert("這是一場技能的試煉——出發吧，K 大師！");
-      document.getElementById("introModal").style.display = "none";
-      loadSaved();
-    }
+    function showRuleModal() {
+  // 隱藏 intro，顯示規則 modal
+  document.getElementById("introModal").style.display = "none";
+  document.getElementById("ruleModal").style.display = "flex";
+}
+
+function startGame() {
+  // 開始遊戲才載入初始狀態
+  document.getElementById("ruleModal").style.display = "none";
+  loadSaved();
+}
+
 
     // ============== 小遊戲邏輯（共 三 關） ==============
     const gameModal     = document.getElementById("gameModal");
@@ -936,7 +1145,7 @@
         if (matchSkill || matchSpend) {
           const cardHtml = `
             <div class="product">
-              <h3>🎯 適合你的球：${prod.name}</h3>
+              <h3>🎯 推薦給您：${prod.name}</h3>
               <img src="${prod.image}" alt="${prod.name}">
               <p><strong>商品名稱：</strong>KOMBO ${prod.name}</p>
               <p>${prod.desc}</p>
