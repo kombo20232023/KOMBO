@@ -481,29 +481,79 @@
 
 
   <!-- ===== 產生技能卡區 ===== -->
-  <div id="skillCardSection" style="margin-top: 40px;">
+  <div id="skillCardSection" style="margin-top: 25px;">
     <h2 class="orange-title">🧩 專屬技能卡</h2>
     <div style="margin-bottom: 10px;">
-      <label>名字：<input type="text" id="playerName" placeholder="輸入名字"></label>
-    </div>
-    <div style="margin-bottom: 10px;">
-      <label style="display: none;">選擇羽球筒顏色：
-  <input type="color" id="tubeColor" value="#000000">
-</label>
-    </div>
-    <div style="margin-bottom: 10px;">
-      <label>技能條顏色：<input type="color" id="barColor" value="#0A574F"></label>
-    </div>
-    <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
-    <button class="tools" onclick="downloadSkillCard()">下載技能卡</button>
-    <div id="cardPreview" style="margin-top: 20px;"></div>
-  </div>
+  <label>名字：</label>
+  <input type="text" id="playerName" placeholder="輸入名字"
+         style="height: 25px; width: 200px; font-size: 16px; margin-left: 8px;">
+</div>
 
-  <script>
- function generateSkillCard() {
-  const name = document.getElementById('playerName').value || 'XXXXXXXX';
-  const tubeColor = document.getElementById('tubeColor').value;
+
+<!-- ✅ 新增這層外包容器 -->
+<div style="display: flex; flex-direction: column; align-items: center;">
+
+<!-- 新增：羽球筒顏色選擇（有圖片與預覽顏色） -->
+<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+  <label for="tubeImageSelect" style="white-space: nowrap;">羽球筒顏色：</label>
+  <select id="tubeImageSelect" onchange="generateSkillCard()" style="width: 60px; height: 32px;">
+    <option value="">（無）</option>
+
+<!-- 紅 / 粉 / 橘 / 黃 -->
+<option value="紅.png" style="background-color:#ff0000;"></option>
+<option value="粉紅.png" style="background-color:#ffc0cb;"></option>
+<option value="薔薇粉.png" style="background-color:#f08080;"></option>
+<option value="橘.png" style="background-color:#ffa500;"></option>
+<option value="膚.png" style="background-color:#fce5cd;"></option>
+<option value="香草黃.png" style="background-color:#f5e29b;"></option>
+<option value="i黃.png" style="background-color:#ffff00;"></option>
+
+<!-- 綠 -->
+<option value="墨綠.png" style="background-color:#355e3b;"></option>
+<option value="軍綠.png" style="background-color:#4b5320;"></option>
+<option value="抹茶綠.png" style="background-color:#b2d3c2;"></option>
+<option value="湖水綠.png" style="background-color:#7fdbca;"></option>
+<option value="薄荷綠.png" style="background-color:#98ff98;"></option>
+<option value="藍綠.png" style="background-color:#20b2aa;"></option>
+
+<!-- 藍 -->
+<option value="寶藍.png" style="background-color:#0047ab;"></option>
+<option value="海藍.png" style="background-color:#00bfff;"></option>
+<option value="天空藍.png" style="background-color:#87ceeb;"></option>
+
+<!-- 紫 -->
+<option value="靛.png" style="background-color:#4b0082;"></option>
+<option value="深紫.png" style="background-color:#800080;"></option>
+<option value="薰衣草紫.png" style="background-color:#e6e6fa;"></option>
+<option value="丁香紫.png" style="background-color:#d8bfd8;"></option>
+
+<!-- 灰 / 棕 / 黑白 -->
+<option value="白.png" style="background-color:#ffffff;"></option>
+<option value="灰.png" style="background-color:#aaaaaa;"></option>
+<option value="銀灰.png" style="background-color:#c0c0c0;"></option>
+<option value="卡其.png" style="background-color:#c3b091;"></option>
+<option value="咖啡.png" style="background-color:#8b4513;"></option>
+<option value="黑.png" style="background-color:#000000; color: white;"></option>
+
+  </select>
+</div>
+
+<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+  <label for="barColor" style="white-space: nowrap;">技能條顏色：</label>
+  <input type="color" id="barColor" value="#0A574F" style="height: 32px; width: 60px; padding: 0; border: 1px solid #aaa;">
+</div>
+<!-- ✅ 最後要補上這個結尾 -->
+</div>
+
+<button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
+<button class="orange-btn" onclick="downloadSkillCard()">下載技能卡</button>
+<div id="cardPreview" style="margin-top: 20px;"></div>
+
+<script>
+function generateSkillCard() {
+  const name = document.getElementById('playerName')?.value || 'XXXXXXXX';
   const barColor = document.getElementById('barColor').value;
+  const tubeImage = document.getElementById('tubeImageSelect').value;
   const lv2width = lv => ((lv - 1) * 20 + 20) + '%';
 
   const html = `
@@ -537,18 +587,9 @@
         font-size: 20px;
       ">羽球技能卡</div>
 
-      <!-- 羽球筒顏色方塊 -->
-      <div style="
-        display: none;
-        position: absolute;
-        top: 152px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60px;
-        height: 100px;
-        background: ${tubeColor};
-        border-radius: 5px;
-      "></div>
+      <!-- 羽球筒圖片 -->
+      ${tubeImage ? `<img src="${tubeImage}" style="position: absolute; top: 65px; left: 50%; transform: translateX(-50%); width: 260px; height: auto;">
+` : ''}
 
       <!-- 技能條 -->
       <div style="
@@ -587,8 +628,10 @@
 
   document.getElementById('cardPreview').innerHTML = html;
 }
+</script>
 
-  </script>
+
+
 
   <script>
   function downloadSkillCard() {
@@ -602,8 +645,6 @@
     });
   }
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -796,23 +837,35 @@
     }
 
     // ============== 分享至 Instagram（或複製至剪貼簿） ==============
-    function shareToInstagram() {
-      const card = document.getElementById('cardArea');
-      if (!card) {
-        alert("請先點選「產生技能卡」再分享！");
-        return;
-      }
+   function shareToInstagram() {
+  const card = document.getElementById('cardArea');
+  if (!card) {
+    alert("請先點選「產生技能卡」再分享！");
+    return;
+  }
 
-      html2canvas(card, { scale: 4 }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'KOMBO_技能卡.png';
-        link.href = canvas.toDataURL();
-        link.click();
+  html2canvas(card, { scale: 4 }).then(canvas => {
+    const imageUrl = canvas.toDataURL("image/png");
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        // 顯示提醒
-        alert("已自動下載技能卡到相簿📸\n\n由於小編能力有限，無法直接開啟 IG，請您手動打開 Instagram，並選擇剛剛下載的圖片上傳分享，謝謝您 🧡");
-      });
+    if (isMobile) {
+      // 手機裝置：顯示圖片並提示用戶長按儲存
+      document.getElementById("cardPreview").innerHTML = `
+        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
+        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
+      `;
+      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
+    } else {
+      // 桌機：直接觸發下載
+      const link = document.createElement('a');
+      link.download = 'KOMBO_技能卡.png';
+      link.href = imageUrl;
+      link.click();
+      alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
     }
+  });
+}
+
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
     function saveState() {
