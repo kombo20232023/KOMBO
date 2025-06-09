@@ -392,6 +392,42 @@
       }
     }
 
+    @media screen and (max-width: 480px) {
+  /* 1. Intro 規則 modal 文字不要太貼邊 & 間距更舒服 */
+  #introModal > div,
+  #ruleModal > div {
+    padding: 0 16px;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  #introModal ol, #ruleModal ol {
+    padding-left: 16px;
+  }
+
+  /* 2. 按鈕上下排列、不黏在一起 */
+  .tools {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .tools button {
+    width: 100%;
+  }
+
+  /* 4. label 與輸入欄上下排列 */
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .form-row label {
+    text-align: left;
+    width: auto;
+  }
+}
+
   </style>
 </head>
 <body>
