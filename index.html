@@ -392,42 +392,6 @@
       }
     }
 
-    @media screen and (max-width: 480px) {
-  /* 1. Intro 規則 modal 文字不要太貼邊 & 間距更舒服 */
-  #introModal > div,
-  #ruleModal > div {
-    padding: 0 16px;
-    line-height: 1.7;
-    font-size: 15px;
-  }
-  #introModal ol, #ruleModal ol {
-    padding-left: 16px;
-  }
-
-  /* 2. 按鈕上下排列、不黏在一起 */
-  .tools {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    margin-top: 24px;
-  }
-  .tools button {
-    width: 100%;
-  }
-
-  /* 4. label 與輸入欄上下排列 */
-  .form-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  .form-row label {
-    text-align: left;
-    width: auto;
-  }
-}
-
   </style>
 </head>
 <body>
@@ -519,10 +483,10 @@
   <!-- ===== 產生技能卡區 ===== -->
   <div id="skillCardSection" style="margin-top: 25px;">
     <h2 class="orange-title">🧩 專屬技能卡</h2>
-    <div style="margin-bottom: 10px;">
+    <div style="margin-bottom: 30px;">
   <label>名字：</label>
   <input type="text" id="playerName" placeholder="輸入名字"
-         style="height: 25px; width: 200px; font-size: 16px; margin-left: 8px;">
+         style="height: 40px; width: 200px; font-size: 16px; margin-left: 8px;">
 </div>
 
 
@@ -534,43 +498,32 @@
   <label for="tubeImageSelect" style="white-space: nowrap;">羽球筒顏色：</label>
   <select id="tubeImageSelect" onchange="generateSkillCard()" style="width: 60px; height: 32px;">
     <option value="">（無）</option>
-
-<!-- 紅 / 粉 / 橘 / 黃 -->
-<option value="紅.png" style="background-color:#ff0000;"></option>
-<option value="粉紅.png" style="background-color:#ffc0cb;"></option>
-<option value="薔薇粉.png" style="background-color:#f08080;"></option>
-<option value="橘.png" style="background-color:#ffa500;"></option>
-<option value="膚.png" style="background-color:#fce5cd;"></option>
-<option value="香草黃.png" style="background-color:#f5e29b;"></option>
-<option value="i黃.png" style="background-color:#ffff00;"></option>
-
-<!-- 綠 -->
-<option value="墨綠.png" style="background-color:#355e3b;"></option>
-<option value="軍綠.png" style="background-color:#4b5320;"></option>
-<option value="抹茶綠.png" style="background-color:#b2d3c2;"></option>
-<option value="湖水綠.png" style="background-color:#7fdbca;"></option>
-<option value="薄荷綠.png" style="background-color:#98ff98;"></option>
-<option value="藍綠.png" style="background-color:#20b2aa;"></option>
-
-<!-- 藍 -->
-<option value="寶藍.png" style="background-color:#0047ab;"></option>
-<option value="海藍.png" style="background-color:#00bfff;"></option>
-<option value="天空藍.png" style="background-color:#87ceeb;"></option>
-
-<!-- 紫 -->
-<option value="靛.png" style="background-color:#4b0082;"></option>
-<option value="深紫.png" style="background-color:#800080;"></option>
-<option value="薰衣草紫.png" style="background-color:#e6e6fa;"></option>
-<option value="丁香紫.png" style="background-color:#d8bfd8;"></option>
-
-<!-- 灰 / 棕 / 黑白 -->
-<option value="白.png" style="background-color:#ffffff;"></option>
-<option value="灰.png" style="background-color:#aaaaaa;"></option>
-<option value="銀灰.png" style="background-color:#c0c0c0;"></option>
-<option value="卡其.png" style="background-color:#c3b091;"></option>
-<option value="咖啡.png" style="background-color:#8b4513;"></option>
-<option value="黑.png" style="background-color:#000000; color: white;"></option>
-
+    <option value="紅.png" style="background-color:#ff0000;">紅</option>
+    <option value="粉紅.png" style="background-color:#ffc0cb;">粉紅</option>
+    <option value="薔薇粉.png" style="background-color:#f08080;">薔薇粉</option>
+    <option value="橘.png" style="background-color:#ffa500;">橘</option>
+    <option value="膚.png" style="background-color:#fce5cd;">膚</option>
+    <option value="i黃.png" style="background-color:#ffff00;">黃</option>
+    <option value="香草黃.png" style="background-color:#f5e29b;">香草黃</option>
+    <option value="墨綠.png" style="background-color:#355e3b;">墨綠</option>
+    <option value="軍綠.png" style="background-color:#4b5320;">軍綠</option>
+    <option value="抹茶綠.png" style="background-color:#b2d3c2;">抹茶綠</option>
+    <option value="湖水綠.png" style="background-color:#7fdbca;">湖水綠</option>
+    <option value="薄荷綠.png" style="background-color:#98ff98;">薄荷綠</option>
+    <option value="藍綠.png" style="background-color:#20b2aa;">藍綠</option>
+    <option value="寶藍.png" style="background-color:#0047ab;">寶藍</option>
+    <option value="海藍.png" style="background-color:#00bfff;">海藍</option>
+    <option value="天空藍.png" style="background-color:#87ceeb;">天空藍</option>
+    <option value="靛.png" style="background-color:#4b0082;">靛</option>
+    <option value="深紫.png" style="background-color:#800080;">深紫</option>
+    <option value="薰衣草紫.png" style="background-color:#e6e6fa;">薰衣草紫</option>
+    <option value="丁香紫.png" style="background-color:#d8bfd8;">丁香紫</option>
+    <option value="白.png" style="background-color:#ffffff;">白</option>
+    <option value="灰.png" style="background-color:#aaaaaa;">灰</option>
+    <option value="銀灰.png" style="background-color:#c0c0c0;">銀灰</option>
+    <option value="卡其.png" style="background-color:#c3b091;">卡其</option>
+    <option value="咖啡.png" style="background-color:#8b4513;">咖啡</option>
+    <option value="黑.png" style="background-color:#000000; color: white;">黑</option>
   </select>
 </div>
 
