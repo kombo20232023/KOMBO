@@ -901,26 +901,29 @@
     }
 
     // ============== 分享至 Instagram（或複製至剪貼簿） ==============
-   function shareToInstagram() {
+   
+    function shareToInstagram() {
   const card = document.getElementById('cardArea');
   if (!card) {
     alert("請先點選「產生技能卡」再分享！");
     return;
   }
 
-  html2canvas(card, { scale: 4 }).then(canvas => {
+  html2canvas(card, { scale: 2 }).then(canvas => {
     const imageUrl = canvas.toDataURL("image/png");
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // 手機裝置：顯示圖片並提示用戶長按儲存
+      // ✅ 手機裝置：長按儲存說明置上方
       document.getElementById("cardPreview").innerHTML = `
-        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿歡迎分享至 IG</strong></p>
-        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
+        <div style="text-align:center; margin-bottom: 8px;">
+          <p style="margin: 6px 0; font-weight: bold;">📸 長按圖片可儲存到相簿再分享至 IG</p>
+        </div>
+        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;">
       `;
-      alert("請長按圖片 → 儲存到相簿後歡迎分享至 IG 🧡");
+      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
     } else {
-      // 桌機：直接觸發下載
+      // 桌機自動下載
       const link = document.createElement('a');
       link.download = 'KOMBO_技能卡.png';
       link.href = imageUrl;
@@ -929,6 +932,7 @@
     }
   });
 }
+
 
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
