@@ -700,7 +700,7 @@
   <script>
   function downloadSkillCard() {
     html2canvas(document.getElementById('cardArea'), {
-      scale: 4 // 讓下載時畫質高（3200x4800）
+      scale: 2 // 讓下載時畫質高（3200x4800）
     }).then(canvas => {
       const link = document.createElement('a');
       link.download = 'KOMBO_技能卡.png';
