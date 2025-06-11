@@ -384,23 +384,30 @@
       font-size: 14px;
       cursor: pointer;
     }
-
-    @media screen and (max-width: 480px) {
-      #cardArea {
-        transform: scale(0.8);
-        transform-origin: top center;
-      }
+    .color-grid {
+    display: flex;
+    flex-wrap: wrap;     /* ⭐ 小圓點會自動換行 */
+    gap: 8px;            /* 圓點之間的間距 */
+    margin-top: 8px;
     }
 
     @media screen and (max-width: 480px) {
-  /* 1. Intro 規則 modal 文字不要太貼邊 & 間距更舒服 */
+  /* 縮小技能卡 */
+  #cardArea {
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+
+  /* Intro、規則 modal 內文字排版 */
   #introModal > div,
   #ruleModal > div {
     padding: 0 16px;
     line-height: 1.7;
     font-size: 15px;
   }
-  #introModal ol, #ruleModal ol {
+
+  #introModal ol,
+  #ruleModal ol {
     padding-left: 16px;
   }
 
@@ -425,6 +432,9 @@
   .form-row label {
     text-align: left;
     width: auto;
+  }
+  .color-grid {
+      justify-content: center;
   }
 }
 
@@ -585,7 +595,21 @@
     <div class="color-swatch" style="background-color:#e6e6fa;" data-img="薰衣草紫.png"></div>
     <div class="color-swatch" style="background-color:#ffffff;" data-img="白.png"></div>
     <div class="color-swatch" style="background-color:#000000;" data-img="黑.png"></div>
-  </div>
+    <div class="color-swatch" style="background-color:#92B863;" data-img="抹茶綠.png"></div>
+    <div class="color-swatch" style="background-color:#514623;" data-img="軍綠.png"></div>
+    <div class="color-swatch" style="background-color:#4EAEEF;" data-img="海藍.png"></div>
+    <div class="color-swatch" style="background-color:#2B1B32;" data-img="深紫.png"></div>
+    <div class="color-swatch" style="background-color:#FFC43C;" data-img="黃.png"></div>
+    <div class="color-swatch" style="background-color:#79756B;" data-img="銀灰.png"></div>
+    <div class="color-swatch" style="background-color:#0D3C2E;" data-img="墨綠.png"></div>
+    <div class="color-swatch" style="background-color:#284467;" data-img="靛.png"></div>
+    <div class="color-swatch" style="background-color:#DDFCEC;" data-img="薄荷綠.png"></div>
+    <div class="color-swatch" style="background-color:#174249;" data-img="藍綠.png"></div>
+    <div class="color-swatch" style="background-color:#d1b6cd;" data-img="丁香紫.png"></div>
+    <div class="color-swatch" style="background-color:#9dcbdb;" data-img="天空藍.png"></div>
+    <div class="color-swatch" style="background-color:#ba935d;" data-img="卡其.png"></div>
+    <div class="color-swatch" style="background-color:#63625f;" data-img="灰.png"></div>
+    <div class="color-swatch" style="background-color:#5d3921;" data-img="咖啡.png"></div>
 </div>
 
 <div class="form-row">
