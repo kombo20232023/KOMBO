@@ -385,11 +385,14 @@
       cursor: pointer;
     }
     .color-grid {
-    display: flex;
-    flex-wrap: wrap;     /* ⭐ 小圓點會自動換行 */
-    gap: 8px;            /* 圓點之間的間距 */
-    margin-top: 8px;
-    }
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 392px;
+      justify-content: center;
+}
+
 
     @media screen and (max-width: 480px) {
   /* 縮小技能卡 */
@@ -434,7 +437,15 @@
     width: auto;
   }
   .color-grid {
-      justify-content: center;
+    flex-wrap: nowrap;              /* 不換行 */
+    overflow-x: auto;               /* 可橫向滑動 */
+    max-width: 100%;                /* 滿版寬度 */
+    padding-bottom: 6px;            /* 避免滑動時被遮住 */
+    -webkit-overflow-scrolling: touch; /* 手機滑動更順 */
+  }
+
+  .color-swatch {
+    flex: 0 0 auto;                 /* 每個圓點固定寬度 */
   }
 }
 
@@ -562,10 +573,12 @@
     margin-bottom: 16px;
   }
   .color-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 392px;
+      justify-content: center;
   }
   .color-swatch {
     width: 32px;
@@ -612,7 +625,7 @@
     <div class="color-swatch" style="background-color:#5d3921;" data-img="咖啡.png"></div>
 </div>
 
-<div class="form-row">
+<div class="form-row" style="margin-top: 16px;">
   <label for="barColor">技能條顏色：</label>
   <input type="color" id="barColor" value="#0A574F" style="height: 32px; width: 60px; padding: 0; border: 1px solid #aaa;">
 </div>
