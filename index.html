@@ -909,7 +909,7 @@
     return;
   }
 
-  html2canvas(card, { scale: 2 }).then(canvas => {
+  html2canvas(card, { scale: 1 }).then(canvas => {
     const imageUrl = canvas.toDataURL("image/png");
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
