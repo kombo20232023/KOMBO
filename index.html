@@ -535,7 +535,7 @@
   <div class="tools">
     <button onclick="openGame()">▶ 玩遊戲賺 K 幣（三關）</button>
     <button onclick="resetAll()">🔄 重置</button>
-    <button class="ig-share-btn" onclick="shareToInstagram()">📤 分享技能卡到 IG
+    <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
     </button>
   </div>
 
@@ -630,14 +630,17 @@
   <input type="color" id="barColor" value="#0A574F" style="height: 32px; width: 60px; padding: 0; border: 1px solid #aaa;">
 </div>
 
-<!-- ✅ 固定放在 skillCardSection 裡，不被 script 蓋掉 -->
-<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 12px;">
-  <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
-  <button class="orange-btn" onclick="downloadSkillCard()">下載技能卡</button>
+<!-- ✅ 外層置中 + 內部按鈕左右排列 -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 16px;">
+  <div style="display: flex; justify-content: center; gap: 16px;">
+    <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
+    <button class="orange-btn" onclick="shareToInstagram()">下載技能卡</button>
+  </div>
+
+  <!-- 預覽區 -->
+  <div id="cardPreview" style="display: flex; justify-content: center; margin-top: 20px;"></div>
 </div>
 
-<!-- 預覽區 -->
-<div id="cardPreview" style="margin-top: 20px;"></div>
 
 
 <script>
@@ -912,10 +915,10 @@
     if (isMobile) {
       // 手機裝置：顯示圖片並提示用戶長按儲存
       document.getElementById("cardPreview").innerHTML = `
-        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
+        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿歡迎分享至 IG</strong></p>
         <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
       `;
-      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
+      alert("請長按圖片 → 儲存到相簿後歡迎分享至 IG 🧡");
     } else {
       // 桌機：直接觸發下載
       const link = document.createElement('a');
@@ -1286,3 +1289,4 @@ function startGame() {
   </script>
 </body>
 </html>
+
