@@ -392,7 +392,46 @@
       }
     }
 
-  </style>
+    @media screen and (max-width: 480px) {
+  /* 1. Intro 規則 modal 文字不要太貼邊 & 間距更舒服 */
+  #introModal > div,
+  #ruleModal > div {
+    padding: 0 16px;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  #introModal ol, #ruleModal ol {
+    padding-left: 16px;
+  }
+
+  /* 2. 按鈕上下排列、不黏在一起 */
+  .tools {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .tools button {
+    width: 100%;
+  }
+
+  /* 4. label 與輸入欄上下排列 */
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .form-row label {
+    text-align: left;
+    width: auto;
+  }
+}
+
+</style>
+
+
+
 </head>
 <body>
   <!-- ===== 第一層 modal：開始遊戲提醒 ===== -->
@@ -483,66 +522,102 @@
   <!-- ===== 產生技能卡區 ===== -->
   <div id="skillCardSection" style="margin-top: 25px;">
     <h2 class="orange-title">🧩 專屬技能卡</h2>
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 10px;">
   <label>名字：</label>
   <input type="text" id="playerName" placeholder="輸入名字"
-         style="height: 40px; width: 200px; font-size: 16px; margin-left: 8px;">
+         style="height: 25px; width: 200px; font-size: 16px; margin-left: 8px;">
 </div>
 
 
 <!-- ✅ 新增這層外包容器 -->
 <div style="display: flex; flex-direction: column; align-items: center;">
 
-<!-- 新增：羽球筒顏色選擇（有圖片與預覽顏色） -->
-<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
-  <label for="tubeImageSelect" style="white-space: nowrap;">羽球筒顏色：</label>
-  <select id="tubeImageSelect" onchange="generateSkillCard()" style="width: 60px; height: 32px;">
-    <option value="">（無）</option>
-    <option value="紅.png" style="background-color:#ff0000;">紅</option>
-    <option value="粉紅.png" style="background-color:#ffc0cb;">粉紅</option>
-    <option value="薔薇粉.png" style="background-color:#f08080;">薔薇粉</option>
-    <option value="橘.png" style="background-color:#ffa500;">橘</option>
-    <option value="膚.png" style="background-color:#fce5cd;">膚</option>
-    <option value="i黃.png" style="background-color:#ffff00;">黃</option>
-    <option value="香草黃.png" style="background-color:#f5e29b;">香草黃</option>
-    <option value="墨綠.png" style="background-color:#355e3b;">墨綠</option>
-    <option value="軍綠.png" style="background-color:#4b5320;">軍綠</option>
-    <option value="抹茶綠.png" style="background-color:#b2d3c2;">抹茶綠</option>
-    <option value="湖水綠.png" style="background-color:#7fdbca;">湖水綠</option>
-    <option value="薄荷綠.png" style="background-color:#98ff98;">薄荷綠</option>
-    <option value="藍綠.png" style="background-color:#20b2aa;">藍綠</option>
-    <option value="寶藍.png" style="background-color:#0047ab;">寶藍</option>
-    <option value="海藍.png" style="background-color:#00bfff;">海藍</option>
-    <option value="天空藍.png" style="background-color:#87ceeb;">天空藍</option>
-    <option value="靛.png" style="background-color:#4b0082;">靛</option>
-    <option value="深紫.png" style="background-color:#800080;">深紫</option>
-    <option value="薰衣草紫.png" style="background-color:#e6e6fa;">薰衣草紫</option>
-    <option value="丁香紫.png" style="background-color:#d8bfd8;">丁香紫</option>
-    <option value="白.png" style="background-color:#ffffff;">白</option>
-    <option value="灰.png" style="background-color:#aaaaaa;">灰</option>
-    <option value="銀灰.png" style="background-color:#c0c0c0;">銀灰</option>
-    <option value="卡其.png" style="background-color:#c3b091;">卡其</option>
-    <option value="咖啡.png" style="background-color:#8b4513;">咖啡</option>
-    <option value="黑.png" style="background-color:#000000; color: white;">黑</option>
-  </select>
+<!-- ✅ 羽球技能卡：含自訂色塊選單 -->
+<style>
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .form-row label {
+    width: 100px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .tube-color-palette {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .color-swatch.selected {
+    border: 3px solid #f60;
+  }
+</style>
+
+<!-- ✅ 自訂羽球筒顏色選單 -->
+<div class="tube-color-palette">
+  <label>羽球筒顏色：</label>
+  <div id="tubeColorOptions" class="color-grid">
+    <div class="color-swatch" style="background-color:#ff0000;" data-img="紅.png"></div>
+    <div class="color-swatch" style="background-color:#ffc0cb;" data-img="粉紅.png"></div>
+    <div class="color-swatch" style="background-color:#f08080;" data-img="薔薇粉.png"></div>
+    <div class="color-swatch" style="background-color:#ffa500;" data-img="橘.png"></div>
+    <div class="color-swatch" style="background-color:#fce5cd;" data-img="膚.png"></div>
+    <div class="color-swatch" style="background-color:#f5e29b;" data-img="香草黃.png"></div>
+    <div class="color-swatch" style="background-color:#7fdbca;" data-img="湖水綠.png"></div>
+    <div class="color-swatch" style="background-color:#0047ab;" data-img="寶藍.png"></div>
+    <div class="color-swatch" style="background-color:#e6e6fa;" data-img="薰衣草紫.png"></div>
+    <div class="color-swatch" style="background-color:#ffffff;" data-img="白.png"></div>
+    <div class="color-swatch" style="background-color:#000000;" data-img="黑.png"></div>
+  </div>
 </div>
 
-<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
-  <label for="barColor" style="white-space: nowrap;">技能條顏色：</label>
+<div class="form-row">
+  <label for="barColor">技能條顏色：</label>
   <input type="color" id="barColor" value="#0A574F" style="height: 32px; width: 60px; padding: 0; border: 1px solid #aaa;">
 </div>
-<!-- ✅ 最後要補上這個結尾 -->
+
+<!-- ✅ 固定放在 skillCardSection 裡，不被 script 蓋掉 -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 12px;">
+  <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
+  <button class="orange-btn" onclick="downloadSkillCard()">下載技能卡</button>
 </div>
 
-<button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
-<button class="orange-btn" onclick="downloadSkillCard()">下載技能卡</button>
+<!-- 預覽區 -->
 <div id="cardPreview" style="margin-top: 20px;"></div>
 
+
 <script>
-function generateSkillCard() {
+  let selectedTubeImage = "";
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+      swatch.classList.add('selected');
+      selectedTubeImage = swatch.dataset.img;
+      generateSkillCard();
+    });
+  });
+
+  function generateSkillCard() {
   const name = document.getElementById('playerName')?.value || 'XXXXXXXX';
-  const barColor = document.getElementById('barColor').value;
-  const tubeImage = document.getElementById('tubeImageSelect').value;
+  const barColor = document.getElementById('barColor')?.value || '#0A574F';
+  const tubeImage = selectedTubeImage;
   const lv2width = lv => ((lv - 1) * 20 + 20) + '%';
 
   const html = `
@@ -557,59 +632,18 @@ function generateSkillCard() {
       padding: 0;
       box-sizing: border-box;
     ">
-      <!-- 名字 -->
-      <div style="
-        position: absolute;
-        top: 36px;
-        width: 100%;
-        text-align: center;
-        font-weight: bold;
-        font-size: 28px;
-      ">${name}</div>
-
-      <!-- 標題 -->
-      <div style="
-        position: absolute;
-        top: 78px;
-        width: 100%;
-        text-align: center;
-        font-size: 20px;
-      ">羽球技能卡</div>
-
-      <!-- 羽球筒圖片 -->
-      ${tubeImage ? `<img src="${tubeImage}" style="position: absolute; top: 65px; left: 50%; transform: translateX(-50%); width: 260px; height: auto;">
-` : ''}
-
-      <!-- 技能條 -->
-      <div style="
-        position: absolute;
-        top: 282px;
-        left: 40px;
-        right: 45px;
-        font-size: 14px;
-        line-height: 26px;
-        text-align: left;
-      ">
+      <div style="position: absolute; top: 36px; width: 100%; text-align: center; font-weight: bold; font-size: 28px;">${name}</div>
+      <div style="position: absolute; top: 78px; width: 100%; text-align: center; font-size: 20px;">羽球技能卡</div>
+      ${tubeImage ? `<img src="${tubeImage}" style="position: absolute; top: 65px; left: 50%; transform: translateX(-50%); width: 260px; height: auto;">` : ''}
+      <div style="position: absolute; top: 282px; left: 40px; right: 45px; font-size: 14px; line-height: 26px; text-align: left;">
         <div>手感</div>
-        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;">
-          <div style="background: ${barColor}; width: ${lv2width(skills.touch)}; height: 100%; border-radius: 4px;"></div>
-        </div>
-
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.touch)}; height: 100%; border-radius: 4px;"></div></div>
         <div>耐打</div>
-        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;">
-          <div style="background: ${barColor}; width: ${lv2width(skills.durability)}; height: 100%; border-radius: 4px;"></div>
-        </div>
-
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.durability)}; height: 100%; border-radius: 4px;"></div></div>
         <div>飛行</div>
-        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;">
-          <div style="background: ${barColor}; width: ${lv2width(skills.flight)}; height: 100%; border-radius: 4px;"></div>
-        </div>
-
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.flight)}; height: 100%; border-radius: 4px;"></div></div>
         <div>外觀</div>
-        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 2.5px;">
-          <div style="background: ${barColor}; width: ${lv2width(skills.look)}; height: 100%; border-radius: 4px;"></div>
-        </div>
-
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 2.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.look)}; height: 100%; border-radius: 4px;"></div></div>
         <div style="font-weight:bold;">售價：$${spent} 元</div>
       </div>
     </div>
@@ -618,6 +652,7 @@ function generateSkillCard() {
   document.getElementById('cardPreview').innerHTML = html;
 }
 </script>
+
 
 
 
