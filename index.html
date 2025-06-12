@@ -761,24 +761,38 @@
   function downloadSkillCard() {
   const card = document.getElementById('cardArea');
 
-  // ✅ 1. 先暫時取消 transform（避免在手機畫面上被縮小）
+  // 偵測是否為手機裝置
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  // 暫時關閉 transform（避免縮圖）
   const originalTransform = card.style.transform;
-  const originalTransformOrigin = card.style.transformOrigin;
   card.style.transform = 'none';
-  card.style.transformOrigin = 'initial';
 
-  // ✅ 2. 使用 html2canvas 匯出目前畫面原尺寸
   html2canvas(card, { scale: 1 }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'KOMBO_技能卡.png';
-    link.href = canvas.toDataURL();
-    link.click();
+    const imageUrl = canvas.toDataURL("image/png");
 
-    // ✅ 3. 匯出完畢後，還原 transform（不影響畫面）
+    // 還原 transform
     card.style.transform = originalTransform;
-    card.style.transformOrigin = originalTransformOrigin;
+
+    if (isMobile) {
+      // ✅ 手機 → 顯示圖片 + 長按儲存提示
+      document.getElementById("cardPreview").innerHTML = `
+        <div style="text-align:center; margin-bottom: 8px;">
+          <p style="margin: 6px 0; font-weight: bold;">📸 長按圖片可儲存到相簿再分享</p>
+        </div>
+        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;">
+      `;
+      alert("請長按圖片 → 儲存到相簿後歡迎分享到IG 🧡");
+    } else {
+      // ✅ 桌機 → 自動下載
+      const link = document.createElement('a');
+      link.download = 'KOMBO_技能卡.png';
+      link.href = imageUrl;
+      link.click();
+    }
   });
 }
+
   </script>
 
 <!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
