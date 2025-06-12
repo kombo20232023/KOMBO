@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>KOMBO 技能卡測試</title>
+  <title>KOMBO 技能卡立即產圖版</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; margin: 20px; }
@@ -12,9 +12,8 @@
   </style>
 </head>
 <body>
-  <h2>KOMBO 技能卡測試</h2>
+  <h2>KOMBO 技能卡（立即轉圖片）</h2>
   <button class="btn" onclick="generateSkillCard()">產生技能卡</button>
-  <button class="btn" onclick="shareToInstagram()">下載技能卡</button>
 
   <div id="cardPreview" class="preview-container"></div>
 
@@ -37,16 +36,14 @@
         </div>
       `;
 
-      const preview = document.getElementById('cardPreview');
-      preview.innerHTML = '';
       const old = document.getElementById('hiddenCard');
       if (old) old.remove();
 
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
       const cardElement = wrapper.firstElementChild;
-      preview.appendChild(cardElement);
 
+      // 建立隱藏 DOM
       const hidden = cardElement.cloneNode(true);
       hidden.id = 'hiddenCard';
       hidden.style.position = 'absolute';
@@ -55,38 +52,21 @@
       hidden.style.transform = 'none';
       hidden.style.transformOrigin = 'unset';
       document.body.appendChild(hidden);
-    }
 
-    function shareToInstagram() {
+      // 用 html2canvas 匯出圖片
       setTimeout(() => {
-        const tempCard = document.getElementById('hiddenCard');
-        if (!tempCard) {
-          alert("仍然無法取得技能卡內容，請稍後再試");
-          return;
-        }
-
-        html2canvas(tempCard, {
+        html2canvas(hidden, {
           scale: 3,
           useCORS: true,
           backgroundColor: null
         }).then(canvas => {
           const imageUrl = canvas.toDataURL("image/png");
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-          if (isMobile) {
-            document.getElementById("cardPreview").innerHTML = `
-              <p><strong>📸 長按圖片可儲存後再分享到 IG</strong></p>
-              <img src="${imageUrl}">
-            `;
-            alert("請長按圖片儲存到相簿，再分享至 IG 🧡");
-          } else {
-            const link = document.createElement('a');
-            link.download = 'KOMBO_技能卡.png';
-            link.href = imageUrl;
-            link.click();
-          }
-
-          tempCard.remove();
+          const preview = document.getElementById("cardPreview");
+          preview.innerHTML = `
+            <p><strong>📸 長按圖片可儲存後再分享到 IG</strong></p>
+            <img src="${imageUrl}">
+          `;
+          hidden.remove();
         });
       }, 100);
     }
