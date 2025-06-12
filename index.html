@@ -902,16 +902,7 @@
 
     // ============== 分享至 Instagram（或複製至剪貼簿） ==============
    
-  function shareToInstagram() {
-  html2canvas(document.getElementById('cardArea'), {
-    scale: 1
-  }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'KOMBO_技能卡.png';
-    link.href = canvas.toDataURL();
-    link.click();
-  });
-}
+  
 
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
@@ -955,7 +946,7 @@
       checkProductMatch();     // 重新檢查推薦
       saveState();             // 存入 localStorage
     }
- }
+ 
 
 
     // ============== 點擊「開始遊戲」按鈕後，隱藏 Intro 彈窗 ==============
