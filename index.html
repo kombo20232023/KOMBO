@@ -913,38 +913,47 @@ document.body.insertAdjacentHTML('beforeend', `
 
        // ============== 分享至 Instagram（或複製至剪貼簿） ==============
    function shareToInstagram() {
-  const tempCard = document.getElementById('hiddenCard');
-  if (!tempCard) {
-    alert("請先點選「產生技能卡」再分享！");
-    return;
+  // 如果還沒產卡 → 自動先跑一次
+  if (!document.getElementById('hiddenCard')) {
+    generateSkillCard(); // 先自動產一次
   }
 
-  html2canvas(tempCard, {
-    scale: 3,
-    useCORS: true,
-    backgroundColor: null
-  }).then(canvas => {
-    const imageUrl = canvas.toDataURL("image/png");
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      document.getElementById("cardPreview").innerHTML = `
-        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
-        <img src="${imageUrl}" style="width: 100%; height: auto; border: 2px solid #ccc; border-radius: 8px;">
-      `;
-      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
-    } else {
-      const link = document.createElement('a');
-      link.download = 'KOMBO_技能卡.png';
-      link.href = imageUrl;
-      link.click();
-      alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
+  // 再次取得隱藏卡片 DOM（保險）
+  setTimeout(() => {
+    const tempCard = document.getElementById('hiddenCard');
+    if (!tempCard) {
+      alert("仍然無法取得技能卡內容，請稍後再試");
+      return;
     }
 
-    // 匯出後移除臨時 DOM
-    tempCard.remove();
-  });
+    html2canvas(tempCard, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: null
+    }).then(canvas => {
+      const imageUrl = canvas.toDataURL("image/png");
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        document.getElementById("cardPreview").innerHTML = `
+          <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
+          <img src="${imageUrl}" style="width: 100%; height: auto; border: 2px solid #ccc; border-radius: 8px;">
+        `;
+        alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
+      } else {
+        const link = document.createElement('a');
+        link.download = 'KOMBO_技能卡.png';
+        link.href = imageUrl;
+        link.click();
+        alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
+      }
+
+      // 移除臨時 DOM（避免重複）
+      tempCard.remove();
+    });
+  }, 100); // 稍微等待 DOM 插入完成
 }
+
 
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
