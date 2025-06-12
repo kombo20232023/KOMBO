@@ -917,7 +917,7 @@
       // 手機裝置：顯示圖片並提示用戶長按儲存
       document.getElementById("cardPreview").innerHTML = `
         <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
-        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
+         <img src="${imageUrl}" style="width: 100%; height: auto; border: 2px solid #ccc; border-radius: 8px; image-rendering: auto;">
       `;
       alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
     } else {
