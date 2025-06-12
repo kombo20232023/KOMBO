@@ -2,74 +2,1292 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>KOMBO 技能卡立即產圖版</title>
+  <title>KOMBO 技能升級模擬器 + 三關小遊戲</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f9f9f9; margin: 20px; }
-    .btn { padding: 10px 20px; background: orange; border: none; color: white; font-size: 16px; border-radius: 6px; margin: 10px; cursor: pointer; }
-    .preview-container { margin-top: 20px; }
-    #cardPreview img { border: 2px solid #ccc; border-radius: 8px; max-width: 100%; }
-  </style>
+    /* ===== 全局樣式 ===== */
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('背景.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .logo {
+      width: 120px;
+      margin: 10px auto;
+      display: block;
+    }
+    .kcoin {
+      font-size: 24px;
+      color: #004080;
+      margin-bottom: 10px;
+    }
+    .spent {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* ===== 開場 Intro Modal ===== */
+    #introModal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: white;
+      z-index: 9999;
+      padding: 30px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: left;
+    }
+    #introModal h2 {
+      color: #f60;
+      margin-bottom: 10px;
+    }
+    #introModal ol {
+      margin-left: 20px;
+      margin-bottom: 10px;
+    }
+    #introModal a {
+      color: #0066cc;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    #introModal button {
+      background: #f60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* ===== 技能升級區 ===== */
+    .skill-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .skill-name {
+      font-size: 18px;
+      color: #004080;
+      width: 30%;
+      text-align: left;
+    }
+    .skill-level {
+      font-size: 18px;
+      width: 20%;
+    }
+    .btn-group {
+      display: flex;
+      gap: 5px;
+      width: 50%;
+      justify-content: flex-end;
+    }
+    /* 升級按鈕：橘色 */
+    .btn.upgrade {
+      background: #FF7E00;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 50%;
+      font-size: 14px;
+    }
+    /* 降級按鈕：藍色 */
+    .btn.downgrade {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 50%;
+      font-size: 14px;
+    }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* ===== 下方工具按鈕 ===== */
+    .tools {
+      margin-top: 30px;
+    }
+    .tools button {
+      margin: 0 8px;
+      padding: 10px 18px;
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .orange-btn {
+      background: #f60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .orange-title {
+      color: #f60;
+      font-weight: bold;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+.orange-btn:hover {
+  opacity: 0.9;
+}
+
+    /* ===== Modal 推薦卡片彈窗 ===== */
+    .modal-overlay {
+      display: none; /* JS 控制顯示或隱藏 */
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9998;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      max-width: 320px;
+      width: 90%;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      animation: fadeInModal 0.3s ease-out;
+      color: #333;
+    }
+    @keyframes fadeInModal {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-content img {
+      max-width: 80%;
+      height: auto;
+      margin-bottom: 12px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .modal-content h3 {
+      color: #D35400;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    .modal-content p {
+      margin: 6px 0;
+      line-height: 1.4;
+      font-size: 14px;
+      color: #333;
+    }
+    .modal-close-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      background: #0066CC;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* ===== 小遊戲 Modal ===== */
+    #gameModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 9997;
+      justify-content: center;
+      align-items: center;
+    }
+    #gameContent {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      width: 360px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      color: #333;
+    }
+    #gameContent h3 {
+      margin-bottom: 12px;
+      color: #D35400;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .grid-button {
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+      height: 80px;
+      overflow: hidden;
+    }
+    .grid-button.selected {
+      outline: 3px solid #FF7E00; /* 標示已選取 */
+    }
+    .grid-button.correct {
+      background: #c8e6c9; /* 綠色提示已選正確 */
+    }
+    .grid-button.wrong {
+      background: #ffcdd2; /* 紅色提示已選錯誤 */
+      cursor: default;
+    }
+    .grid-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #confirmBtn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #FF7E00;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #confirmBtn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #gameStatus {
+      font-size: 16px;
+      margin-top: 12px;
+    }
+    #followButtons {
+      margin-top: 10px;
+      display: none; /* 只有三關都答完才顯示 */
+    }
+    #followButtons button {
+      margin: 4px;
+      padding: 6px 12px;
+      background: #0066CC;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #exitGameBtn {
+      margin-top: 16px;
+      padding: 6px 12px;
+      background: #666;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* ===== 下方所有符合條件的卡片：Flex 容器 ===== */
+    .product-recommend {
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: wrap;           /* 超出寬度時自動換行 */
+      justify-content: center;   /* 卡片置中對齊 */
+      gap: 16px;                 /* 卡片之間的間距 */
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    /* ===== 單張產品卡片樣式 ===== */
+    .product {
+      background-color: #FFF8E1;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin: 0;                    /* 交由父容器的 gap 決定間距 */
+      max-width: 300px;             /* 卡片最大寬度 */
+      width: 100%;                  /* 在 Flex 下會根據父容器空間調整 */
+      flex: 1 1 280px;              /* 最小 280px 寬度，畫面寬度足夠時可放大 */
+      text-align: center;
+      animation: fadeIn 0.4s ease-out;
+      color: #333;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .product img {
+      display: block;
+      margin: 0 auto 12px;
+      max-width: 80%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .product h3 {
+      color: #D35400;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    .product p {
+      margin: 6px 0;
+      line-height: 1.4;
+      font-size: 14px;
+      color: #333;
+    }
+    .product a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 18px;
+      background: linear-gradient(90deg, #FF7E00, #D35400);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 15px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      transition: opacity 0.2s;
+    }
+    .product a:hover {
+      opacity: 0.9;
+    }
+    .center-text {
+      text-align: center;
+    }
+    .ig-share-btn {
+      background: linear-gradient(45deg, #f58529, #dd2a7b, #8134af);
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .color-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 392px;
+      justify-content: center;
+}
+
+
+    @media screen and (max-width: 480px) {
+  /* 縮小技能卡 */
+  #cardArea {
+    transform: scale(1);
+    transform-origin: top center;
+  }
+
+  /* Intro、規則 modal 內文字排版 */
+  #introModal > div,
+  #ruleModal > div {
+    padding: 0 16px;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  #introModal ol,
+  #ruleModal ol {
+    padding-left: 16px;
+  }
+
+  /* 2. 按鈕上下排列、不黏在一起 */
+  .tools {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .tools button {
+    width: 100%;
+  }
+
+  /* 4. label 與輸入欄上下排列 */
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .form-row label {
+    text-align: left;
+    width: auto;
+  }
+  .color-grid {
+    flex-wrap: nowrap;              /* 不換行 */
+    overflow-x: auto;               /* 可橫向滑動 */
+    max-width: 100%;                /* 滿版寬度 */
+    padding-bottom: 6px;            /* 避免滑動時被遮住 */
+    -webkit-overflow-scrolling: touch; /* 手機滑動更順 */
+  }
+
+  .color-swatch {
+    flex: 0 0 auto;                 /* 每個圓點固定寬度 */
+  }
+}
+
+</style>
+
+
+
 </head>
 <body>
-  <h2>KOMBO 技能卡（立即轉圖片）</h2>
-  <button class="btn" onclick="generateSkillCard()">產生技能卡</button>
+  <!-- ===== 第一層 modal：開始遊戲提醒 ===== -->
+  <div id="introModal">
+    <div style="max-width:500px">
+      <h2 class="center-text">🎮 KOMBO 慷柏體育 🎮</h2>
+      <p><strong>遊玩前的注意事項：</strong></p>
+      <ol style="margin-left:20px;">
+        <li>此評分系統僅供參考，為 KOMBO 內部統計資料，不代表每位球友的實際使用感受，請帶著<strong>輕鬆的心情遊玩</strong>！</li>
+        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本有調整，所有金額皆會有所變動。若小編來不及更新，還請大家見諒！</li>
+      </ol>
+      <p class="center-text">📩 小編不是本科生若有任何建議都歡迎  
+        <a href="https://lin.ee/syEA7iU" target="_blank">
+          官方Line
+        </a> 私訊我們喔！
+      </p>
+      <div style="text-align:center; margin-top:20px;">
+        <button onclick="showRuleModal()">同意</button>
+      </div>
+    </div>
+  </div>
 
-  <div id="cardPreview" class="preview-container"></div>
+  <!-- ===== 第二層 modal：開始遊戲提醒 ===== -->
+  <div id="ruleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 9998; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: left;">
+    <div style="max-width: 500px;">
+      <h2 class="orange-title center-text">🔥 創造屬於你的羽毛球 🔥</h2>
+      <p><strong>遊戲介紹：</strong></p>
+      <ol style="margin-left: 20px;">
+        <li>目前已經花費了$450K幣，只獲得Lv.1的羽毛球，遊玩小遊戲來獲取更多K幣，提升你的羽毛球技能吧!</li>
+      </ol>
+      <p class="center-text" style="font-weight: bold; font-size: 18px;">
+      這是一場技能的試煉——出發吧，K 大師！
+      </p>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <button class="orange-btn" onclick="startGame()">開始遊戲</button>
+    </div>
+  </div>
+</div>
+  <!-- ===== LOGO & 已花費/剩餘 K 幣 ===== -->
+  <img src="LOGO.jpg" class="logo" alt="KOMBO Logo">
+  <div class="spent">已花費 K 幣：<span id="spent">450</span> 元</div>
+  <div class="kcoin">剩餘 K 幣：<span id="kcoin">0</span> 元</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- ===== 技能區 ===== -->
+  <div class="skill-block">
+    <div class="skill-name">手感</div>
+    <div class="skill-level" id="lv-touch">Lv.1</div>
+    <div class="btn-group">
+      <button class="btn upgrade" id="up-touch" onclick="upgrade('touch')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-touch" onclick="downgrade('touch')" disabled>降級（-10 元）</button>
+    </div>
+  </div>
+  <div class="skill-block">
+    <div class="skill-name">耐打</div>
+    <div class="skill-level" id="lv-durability">Lv.1</div>
+    <div class="btn-group">
+      <button class="btn upgrade" id="up-durability" onclick="upgrade('durability')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-durability" onclick="downgrade('durability')" disabled>降級（-10 元）</button>
+    </div>
+  </div>
+  <div class="skill-block">
+    <div class="skill-name">飛行</div>
+    <div class="skill-level" id="lv-flight">Lv.1</div>
+    <div class="btn-group">
+      <button class="btn upgrade" id="up-flight" onclick="upgrade('flight')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-flight" onclick="downgrade('flight')" disabled>降級（-10 元）</button>
+    </div>
+  </div>
+  <div class="skill-block">
+    <div class="skill-name">外觀</div>
+    <div class="skill-level" id="lv-look">Lv.1</div>
+    <div class="btn-group">
+      <button class="btn upgrade" id="up-look" onclick="upgrade('look')" disabled>升級（+10 元）</button>
+      <button class="btn downgrade" id="down-look" onclick="downgrade('look')" disabled>降級（-10 元）</button>
+    </div>
+  </div>
+
+  <!-- ===== 工具按鈕 ===== -->
+  <div class="tools">
+    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（三關）</button>
+    <button onclick="resetAll()">🔄 重置</button>
+    <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
+    </button>
+  </div>
+
+
+  <!-- ===== 產生技能卡區 ===== -->
+  <div id="skillCardSection" style="margin-top: 25px;">
+    <h2 class="orange-title">🧩 專屬技能卡</h2>
+    <div style="margin-bottom: 10px;">
+  <label>名字：</label>
+  <input type="text" id="playerName" placeholder="輸入名字"
+         style="height: 25px; width: 200px; font-size: 16px; margin-left: 8px;">
+</div>
+
+
+<!-- ✅ 新增這層外包容器 -->
+<div style="display: flex; flex-direction: column; align-items: center;">
+
+<!-- ✅ 羽球技能卡：含自訂色塊選單 -->
+<style>
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .form-row label {
+    width: 100px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .tube-color-palette {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .color-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 392px;
+      justify-content: center;
+  }
+  .color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .color-swatch.selected {
+    border: 3px solid #f60;
+  }
+</style>
+
+<!-- ✅ 自訂羽球筒顏色選單 -->
+<div class="tube-color-palette">
+  <label>羽球筒顏色：</label>
+  <div id="tubeColorOptions" class="color-grid">
+    <div class="color-swatch" style="background-color:#ff0000;" data-img="紅.png"></div>
+    <div class="color-swatch" style="background-color:#ffc0cb;" data-img="粉紅.png"></div>
+    <div class="color-swatch" style="background-color:#f08080;" data-img="薔薇粉.png"></div>
+    <div class="color-swatch" style="background-color:#ffa500;" data-img="橘.png"></div>
+    <div class="color-swatch" style="background-color:#fce5cd;" data-img="膚.png"></div>
+    <div class="color-swatch" style="background-color:#f5e29b;" data-img="香草黃.png"></div>
+    <div class="color-swatch" style="background-color:#7fdbca;" data-img="湖水綠.png"></div>
+    <div class="color-swatch" style="background-color:#0047ab;" data-img="寶藍.png"></div>
+    <div class="color-swatch" style="background-color:#e6e6fa;" data-img="薰衣草紫.png"></div>
+    <div class="color-swatch" style="background-color:#ffffff;" data-img="白.png"></div>
+    <div class="color-swatch" style="background-color:#000000;" data-img="黑.png"></div>
+    <div class="color-swatch" style="background-color:#92B863;" data-img="抹茶綠.png"></div>
+    <div class="color-swatch" style="background-color:#514623;" data-img="軍綠.png"></div>
+    <div class="color-swatch" style="background-color:#4EAEEF;" data-img="海藍.png"></div>
+    <div class="color-swatch" style="background-color:#2B1B32;" data-img="深紫.png"></div>
+    <div class="color-swatch" style="background-color:#FFC43C;" data-img="黃.png"></div>
+    <div class="color-swatch" style="background-color:#79756B;" data-img="銀灰.png"></div>
+    <div class="color-swatch" style="background-color:#0D3C2E;" data-img="墨綠.png"></div>
+    <div class="color-swatch" style="background-color:#284467;" data-img="靛.png"></div>
+    <div class="color-swatch" style="background-color:#DDFCEC;" data-img="薄荷綠.png"></div>
+    <div class="color-swatch" style="background-color:#174249;" data-img="藍綠.png"></div>
+    <div class="color-swatch" style="background-color:#d1b6cd;" data-img="丁香紫.png"></div>
+    <div class="color-swatch" style="background-color:#9dcbdb;" data-img="天空藍.png"></div>
+    <div class="color-swatch" style="background-color:#ba935d;" data-img="卡其.png"></div>
+    <div class="color-swatch" style="background-color:#63625f;" data-img="灰.png"></div>
+    <div class="color-swatch" style="background-color:#5d3921;" data-img="咖啡.png"></div>
+</div>
+
+<div class="form-row" style="margin-top: 16px;">
+  <label for="barColor">技能條顏色：</label>
+  <input type="color" id="barColor" value="#0A574F" style="height: 32px; width: 60px; padding: 0; border: 1px solid #aaa;">
+</div>
+
+<!-- ✅ 外層置中 + 內部按鈕左右排列 -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 16px;">
+  <div style="display: flex; justify-content: center; gap: 16px;">
+    <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
+    <button class="orange-btn" onclick="shareToInstagram()">下載技能卡</button>
+  </div>
+
+  <!-- 預覽區 -->
+  <div id="cardPreview" style="display: flex; justify-content: center; margin-top: 20px;"></div>
+</div>
+
+
+
+<script>
+  let selectedTubeImage = "";
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+      swatch.classList.add('selected');
+      selectedTubeImage = swatch.dataset.img;
+      generateSkillCard();
+    });
+  });
+
+  function generateSkillCard() {
+  const name = document.getElementById('playerName')?.value || 'XXXXXXXX';
+  const barColor = document.getElementById('barColor')?.value || '#0A574F';
+  const tubeImage = selectedTubeImage;
+  const lv2width = lv => ((lv - 1) * 20 + 20) + '%';
+
+  const html = `
+    <div id="cardArea" style="
+      position: relative;
+      width: 320px;
+      aspect-ratio: 2/3;
+      background: url('羽球技能卡背景.png') no-repeat center center;
+      background-size: contain;
+      font-family: sans-serif;
+      margin: auto;
+      padding: 0;
+      box-sizing: border-box;
+    ">
+      <div style="position: absolute; top: 36px; width: 100%; text-align: center; font-weight: bold; font-size: 28px;">${name}</div>
+      <div style="position: absolute; top: 78px; width: 100%; text-align: center; font-size: 20px;">羽球技能卡</div>
+      ${tubeImage ? `<img src="${tubeImage}" style="position: absolute; top: 65px; left: 50%; transform: translateX(-50%); width: 260px; height: auto;">` : ''}
+      <div style="position: absolute; top: 282px; left: 40px; right: 45px; font-size: 14px; line-height: 26px; text-align: left;">
+        <div>手感</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.touch)}; height: 100%; border-radius: 4px;"></div></div>
+        <div>耐打</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.durability)}; height: 100%; border-radius: 4px;"></div></div>
+        <div>飛行</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 1.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.flight)}; height: 100%; border-radius: 4px;"></div></div>
+        <div>外觀</div>
+        <div style="background: #ccc; height: 10px; border-radius: 4px; margin-bottom: 2.5px;"><div style="background: ${barColor}; width: ${lv2width(skills.look)}; height: 100%; border-radius: 4px;"></div></div>
+        <div style="font-weight:bold;">售價：$${spent} 元</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('cardPreview').innerHTML = html;
+}
+</script>
+
+
+
+
+
   <script>
-    function generateSkillCard() {
-      const html = `
-        <div id="cardArea" style="
-          position: relative;
-          width: 320px;
-          aspect-ratio: 2/3;
-          background: url('羽球技能卡背景.png') no-repeat center center;
-          background-size: cover;
-          font-family: sans-serif;
-          border: 2px solid #000;
-        ">
-          <div style="position: absolute; top: 20px; width: 100%; text-align: center; font-weight: bold; font-size: 24px;">XXXXXXXX</div>
-          <div style="position: absolute; top: 60px; width: 100%; text-align: center; font-size: 18px;">羽球技能卡</div>
-          <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; font-size: 16px;">售價：$450 元</div>
-        </div>
-      `;
+  function downloadSkillCard() {
+  html2canvas(document.getElementById('cardArea'), {
+    scale: 3,
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'KOMBO_技能卡.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+}
+  </script>
 
-      const old = document.getElementById('hiddenCard');
-      if (old) old.remove();
+<!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- ===== 推薦彈窗 ===== -->
+  <div class="modal-overlay" id="recommendModal">
+    <div class="modal-content" id="modalContent">
+      <h3>🎯 適合您的球：<span id="modalName"></span></h3>
+      <img id="modalImg" src="" alt="產品圖">
+      <p id="modalDesc"></p>
+      <p><strong>售價：</strong>$<span id="modalPrice"></span>/筒</p>
+      <p>
+        手感 Lv.<span id="modalTouch"></span> ｜ 
+        耐打 Lv.<span id="modalDurability"></span> ｜ 
+        飛行 Lv.<span id="modalFlight"></span> ｜ 
+        外觀 Lv.<span id="modalLook"></span>
+      </p>
+      <button class="modal-close-btn" id="closeModalBtn">關閉</button>
+    </div>
+  </div>
 
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = html;
-      const cardElement = wrapper.firstElementChild;
+  <!-- ===== 小遊戲彈窗（共三關） ===== -->
+  <div id="gameModal">
+    <div id="gameContent">
+      <h3 id="gameTitle">關卡 1：選出 KOMBO 產品 （還剩 <span id="needCount">5</span> 個）</h3>
+      <div class="grid-container" id="gridContainer">
+        <!-- JS 會動態插入 3×3 的按鈕（圖片） -->
+      </div>
+      <button id="confirmBtn" onclick="confirmSelection()" disabled>確定</button>
+      <p id="gameStatus"></p>
+      <div id="followButtons">
+        <p>恭喜完成三關！還可額外加碼：</p>
+        <button id="igBtn" onclick="followIG()">追蹤 IG（+50 元）</button>
+        <button id="fbBtn" onclick="followFB()">按讚 FB（+50 元）</button>
+      </div>
+      <button id="exitGameBtn">✕ 離開遊戲</button>
+    </div>
+  </div>
 
-      // 建立隱藏 DOM
-      const hidden = cardElement.cloneNode(true);
-      hidden.id = 'hiddenCard';
-      hidden.style.position = 'absolute';
-      hidden.style.top = '-9999px';
-      hidden.style.left = '-9999px';
-      hidden.style.transform = 'none';
-      hidden.style.transformOrigin = 'unset';
-      document.body.appendChild(hidden);
+  <!-- ===== 下方產品卡片區 ===== -->
+  <div class="product-recommend" id="productDisplay">
+    <!-- JS 會把所有符合條件的 <div class="product">…</div> 動態插入到這裡 -->
+  </div>
 
-      // 用 html2canvas 匯出圖片
-      setTimeout(() => {
-        html2canvas(hidden, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: null
-        }).then(canvas => {
-          const imageUrl = canvas.toDataURL("image/png");
-          const preview = document.getElementById("cardPreview");
-          preview.innerHTML = `
-            <p><strong>📸 長按圖片可儲存後再分享到 IG</strong></p>
-            <img src="${imageUrl}">
-          `;
-          hidden.remove();
-        });
-      }, 100);
+  <!-- ===== 點擊音效 ===== -->
+  <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_f7998b6be6.mp3?filename=click-124467.mp3"></audio>
+
+  <script>
+    // ============== 全局狀態 ==============
+    let kcoin = 0;                     // 剩餘 K 幣，一開始為 0
+    let spent = 450;                   // 已花費 K 幣，一開始為 450
+    const maxLevel = 5;
+    const skills = { touch: 1, durability: 1, flight: 1, look: 1 };
+    const displayLv = {
+      touch: document.getElementById("lv-touch"),
+      durability: document.getElementById("lv-durability"),
+      flight: document.getElementById("lv-flight"),
+      look: document.getElementById("lv-look")
+    };
+
+    let soundOn = true;
+    let hasShownModalFor = new Set();  // 紀錄已經彈過推薦 Modal 的產品
+
+    // ===== 產品列表（由高價到低價排序） =====
+    const products = [
+      {
+        name: "K3A",
+        price: 720,
+        touch: 5,
+        durability: 5,
+        flight: 5,
+        look: 4,
+        image: "K3A.jpg",
+        desc: "使用三、四級鵝毛，鵝毛毛桿較為細長，大毛中的方頭毛始於韌性高且結實！搭配上特調的高回復性膠水，讓球不因打擊而鬆散！",
+        link: "https://lin.ee/syEA7iU"
+      },
+      {
+        name: "K3",
+        price: 720,
+        touch: 5,
+        durability: 5,
+        flight: 4.5,
+        look: 4.5,
+        image: "K3.jpg",
+        desc: "選用一、二級刺骨鴨潔白毛片，特選的部位，特選膠水，使耐打度更上一階，同時將球頭的密度提升，使手感更加扎實，飛行更加穩定。",
+        link: "https://lin.ee/syEA7iU"
+      },
+      {
+        name: "K5+",
+        price: 635,
+        touch: 4,
+        durability: 4,
+        flight: 4,
+        look: 4,
+        image: "K5+.jpg",
+        desc: "選用正三級的刺骨鴨，相較於一二級毛片較黃，略有細微瑕疵，整體兼具耐用表現與親民價格。",
+        link: "https://lin.ee/syEA7iU"
+      },
+      {
+        name: "K5A",
+        price: 630,
+        touch: 4,
+        durability: 4,
+        flight: 3.5,
+        look: 3,
+        image: "K5A.jpg",
+        desc: "使用四、五級鵝毛，仍選用特定的部位，讓質量能達到一定的水準，搭配上高彈性的膠水，使飛行穩定又兼顧好的手感！",
+        link: "https://lin.ee/syEA7iU"
+      },
+      {
+        name: "K5",
+        price: 595,
+        touch: 4,
+        durability: 3.5,
+        flight: 3.5,
+        look: 3,
+        image: "K5.jpg",
+        desc: "選用毛桿Q彈、羽翼厚實的三、四級刺骨鴨，搭配特調膠水，使手感舒適不生硬，更不容易斷毛好控制，穩定飛行，是高性價比的首選。",
+        link: "https://lin.ee/syEA7iU"
+      },
+      {
+        name: "KC",
+        price: 560,
+        touch: 4,
+        durability: 3,
+        flight: 4,
+        look: 2,
+        image: "KC.jpg",
+        desc: "使用天然五級鵝毛，雖然毛色的整潔度不是精選，但具有正常鵝毛的穩定性與耐打度，搭配上複合式膠水，打感舒適，好控球。",
+        link: "https://lin.ee/syEA7iU"
+      },
+      {
+        name: "K7pro",
+        price: 480,
+        touch: 2,
+        durability: 4,
+        flight: 2,
+        look: 2,
+        image: "K7PRO.jpg",
+        desc: "使用一、二級鵝大刀，若能接受飛行沒那麼穩定的話，可以試試這款球。",
+        link: "https://lin.ee/syEA7iU"
+      }
+    ];
+
+    // ============== 音效播放 ==============
+    function playSound() {
+      if (soundOn) {
+        document.getElementById("clickSound").play();
+      }
     }
+
+    // ============== 升級／降級 ==============
+    function upgrade(skill) {
+      // 只要玩家剩餘 K 幣 ≥ 10、且技能尚未滿，就可以升 0.5 級，並扣 10 元，spent 加 10
+      if (skills[skill] < maxLevel && kcoin >= 10) {
+        skills[skill] += 0.5;
+        kcoin -= 10;
+        spent += 10;
+        playSound();
+        updateDisplay(skill);
+        saveState();
+      }
+    }
+    function downgrade(skill) {
+      // 如果該技能大於 Lv.1，就可降 0.5 級，並退 10 元到剩餘 K 幣，spent 減 10
+      if (skills[skill] > 1) {
+        skills[skill] -= 0.5;
+        kcoin += 10;
+        spent -= 10;
+        playSound();
+        updateDisplay(skill);
+        saveState();
+      }
+    }
+
+    // ============== 更新畫面顯示 ==============
+    function updateDisplay(skill) {
+      // 更新剩餘與已花費 K 幣
+      document.getElementById("kcoin").textContent = kcoin;
+      document.getElementById("spent").textContent = spent;
+
+      // 更新單一技能的等級文字
+      displayLv[skill].textContent = (skills[skill] >= maxLevel) ? "已滿等" : ("Lv." + skills[skill]);
+
+      // 升級/降級按鈕是否可用
+      document.getElementById("up-" + skill).disabled = (skills[skill] >= maxLevel || kcoin < 10);
+      document.getElementById("down-" + skill).disabled = (skills[skill] <= 1);
+
+      // 每次更新都嘗試觸發推薦 Modal 或渲染下方卡片
+      checkProductMatch();
+    }
+
+       // ============== 分享至 Instagram（或複製至剪貼簿） ==============
+   function shareToInstagram() {
+  const card = document.getElementById('cardArea');
+  if (!card) {
+    alert("請先點選「產生技能卡」再分享！");
+    return;
+  }
+
+  html2canvas(card, { scale: 1 }).then(canvas => {
+    const imageUrl = canvas.toDataURL("image/png");
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // 手機裝置：顯示圖片並提示用戶長按儲存
+      document.getElementById("cardPreview").innerHTML = `
+        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
+        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
+      `;
+      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
+    } else {
+      // 桌機：直接觸發下載
+      const link = document.createElement('a');
+      link.download = 'KOMBO_技能卡.png';
+      link.href = imageUrl;
+      link.click();
+      alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
+    }
+  });
+}
+
+
+    // ============== 重新設定 & 存 / 載 本地化狀態 ==============
+    function saveState() {
+      localStorage.setItem("kombo_skills", JSON.stringify({ kcoin, spent, skills }));
+    }
+    function loadSaved() {
+      // 清空 localStorage，回到初始狀態：K 幣 0，已花費 450，技能 Lv.1
+      localStorage.removeItem("kombo_skills");
+      kcoin = 0;
+      spent = 450;
+      skills.touch = skills.durability = skills.flight = skills.look = 1;
+      for (let key in skills) {
+        displayLv[key].textContent = "Lv.1";
+        document.getElementById("up-" + key).disabled = true;
+        document.getElementById("down-" + key).disabled = true;
+      }
+      document.getElementById("kcoin").textContent = kcoin;
+      document.getElementById("spent").textContent = spent;
+      hasShownModalFor.clear();
+      renderAllMatchingCards();
+    }
+
+    // ▶ **重置按鈕**：呼叫 loadSaved()，並關閉所有 Modal
+    function resetAll() {
+      // 將 spent 退還給 kcoin
+      kcoin += spent-450;
+      spent = 450;
+
+      // 重設技能為 Lv.1
+      skills.touch = skills.durability = skills.flight = skills.look = 1;
+
+      // 更新畫面
+      for (let key in skills) {
+        displayLv[key].textContent = "Lv.1";
+      }
+      document.getElementById("kcoin").textContent = kcoin;
+      document.getElementById("spent").textContent = spent;
+
+      enableUpgradeButtons();  // 重新啟用按鈕
+      checkProductMatch();     // 重新檢查推薦
+      saveState();             // 存入 localStorage
+    }
+ 
+ 
+
+
+    // ============== 點擊「開始遊戲」按鈕後，隱藏 Intro 彈窗 ==============
+    function showRuleModal() {
+  // 隱藏 intro，顯示規則 modal
+  document.getElementById("introModal").style.display = "none";
+  document.getElementById("ruleModal").style.display = "flex";
+}
+
+function startGame() {
+  // 開始遊戲才載入初始狀態
+  document.getElementById("ruleModal").style.display = "none";
+  loadSaved();
+}
+
+
+    // ============== 小遊戲邏輯（共 三 關） ==============
+    const gameModal     = document.getElementById("gameModal");
+    const gridContainer = document.getElementById("gridContainer");
+    const gameTitle     = document.getElementById("gameTitle");
+    const gameStatus    = document.getElementById("gameStatus");
+    const confirmBtn    = document.getElementById("confirmBtn");
+    const followButtons = document.getElementById("followButtons");
+    const igBtn         = document.getElementById("igBtn");
+    const fbBtn         = document.getElementById("fbBtn");
+    const exitGameBtn   = document.getElementById("exitGameBtn");
+
+    let currentRound = 1;       // 現在第幾關 (1~3)
+    let selectedCount = 0;      // 當前玩家已選取的格子數 (最多 5)
+    let totalEarned = 0;        // 本次遊戲累積獲得多少 K 幣
+    let canFollowIG = true;     // 判斷是否已按過 IG
+    let canFollowFB = true;     // 判斷是否已按過 FB
+
+    // 各關的題目選項（9 個），其中 5 個正確。請自行替換 image 路徑
+    const roundsData = {
+      1: {
+        items: [
+          { label: "K7pro", isCorrect: true,  image: "K7PRO.jpg" },
+          { label: "Nike 球拍", isCorrect: false, image: "K7PRO.jpg" },
+          { label: "KC", isCorrect: true,  image: "KC.jpg" },
+          { label: "Adidas 球鞋", isCorrect: false, image: "K7PRO.jpg" },
+          { label: "K5", isCorrect: true,  image: "K5.jpg" },
+          { label: "Yonex 球桿", isCorrect: false, image: "K7PRO.jpg" },
+          { label: "Li-Ning 鞋", isCorrect: false, image: "K7PRO.jpg" },
+          { label: "K3", isCorrect: true,  image: "K3.jpg" },
+          { label: "K3A", isCorrect: true,  image: "K3A.jpg" }
+        ]
+      },
+      2: {
+        items: [
+          { label: "K3A", isCorrect: true,  image: "K3A.jpg" },
+          { label: "Puma 服飾", isCorrect: false, image: "K3A.jpg" },
+          { label: "Yonex 羽球", isCorrect: false, image: "K3A.jpg" },
+          { label: "KC", isCorrect: true,  image: "KC.jpg" },
+          { label: "K5+", isCorrect: true,  image: "K5+.jpg" },
+          { label: "Mizuno 球鞋", isCorrect: false, image: "K3A.jpg" },
+          { label: "K7pro", isCorrect: false, image: "K7PRO.jpg" },
+          { label: "K3", isCorrect: true,  image: "K3.jpg" },
+          { label: "Yonex 球拍", isCorrect: true,  image: "K3A.jpg" }
+        ]
+      },
+      3: {
+        items: [
+          { label: "K5A", isCorrect: true,  image: "K5A.jpg" },
+          { label: "K5", isCorrect: true,  image: "K5.jpg" },
+          { label: "Adidas 球衣", isCorrect: false, image: "K3A.jpg" },
+          { label: "K3", isCorrect: true,  image: "K3.jpg" },
+          { label: "K3A", isCorrect: true,  image: "K3A.jpg" },
+          { label: "Yonex 球拍", isCorrect: false, image: "K3A.jpg" },
+          { label: "KC", isCorrect: false, image: "KC.jpg" },
+          { label: "Nike 球鞋", isCorrect: false, image: "K3A.jpg" },
+          { label: "Li-Ning 鞋", isCorrect: true,  image: "K3A.jpg" }
+        ]
+      }
+    };
+
+    // 打開小遊戲：初始化第一關
+    function openGame() {
+      currentRound  = 1;
+      totalEarned   = 0;
+      canFollowIG   = true;
+      canFollowFB   = true;
+      igBtn.disabled = false;
+      fbBtn.disabled = false;
+      followButtons.style.display = "none";
+      setupRound(currentRound);
+      gameModal.style.display = "flex";
+    }
+
+    // 設定某一關的題目
+    function setupRound(roundNum) {
+      const data = roundsData[roundNum];
+      selectedCount = 0;
+      gameStatus.textContent = "";
+      confirmBtn.disabled = true; 
+      gameTitle.textContent = `關卡 ${roundNum}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
+      gridContainer.innerHTML = "";
+
+      // 將九個選項隨機打亂順序再渲染
+      const arr = [...data.items];
+      arr.sort(() => Math.random() - 0.5);
+
+      arr.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "grid-button";
+        btn.innerHTML = `<img src="${item.image}" alt="${item.label}">`;
+        btn.dataset.isCorrect = item.isCorrect;
+        btn.dataset.selected = "false";
+        btn.onclick = () => toggleSelect(btn, item.isCorrect);
+        gridContainer.appendChild(btn);
+      });
+    }
+
+    // 切換按鈕的「已選取」狀態
+    function toggleSelect(btn, isCorrect) {
+      if (btn.classList.contains("correct") || btn.classList.contains("wrong")) {
+        return; // 已揭曉的格子不能再選
+      }
+      const currentlySelected = btn.dataset.selected === "true";
+      if (!currentlySelected && selectedCount < 5) {
+        btn.classList.add("selected");
+        btn.dataset.selected = "true";
+        selectedCount++;
+      } else if (currentlySelected) {
+        btn.classList.remove("selected");
+        btn.dataset.selected = "false";
+        selectedCount--;
+      }
+      confirmBtn.disabled = (selectedCount < 5);
+      gameTitle.textContent = `關卡 ${currentRound}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
+    }
+
+    // 按下「確定」才揭曉本關答案並計分
+    function confirmSelection() {
+      const buttons = gridContainer.querySelectorAll(".grid-button");
+      let correctCountThisRound = 0;
+
+      buttons.forEach(btn => {
+        const isCorrect = (btn.dataset.isCorrect === "true");
+        const isSelected = (btn.dataset.selected === "true");
+        if (isCorrect) {
+          // 正確的格子標示綠色
+          btn.classList.add("correct");
+          if (isSelected) {
+            correctCountThisRound++;
+          }
+        } else {
+          // 錯誤的格子如果被選到，標示紅色
+          if (isSelected) {
+            btn.classList.add("wrong");
+          }
+        }
+        // 無論如何都不能再切換
+        btn.onclick = null;
+      });
+
+      const gain = correctCountThisRound * 20;
+      totalEarned += gain;
+      gameStatus.textContent = `本關你選對 ${correctCountThisRound} 個，獲得 ${gain} 元！`;
+
+      // 如果不是最後一關，在 1 秒後載入下一關
+      if (currentRound < 3) {
+        setTimeout(() => {
+          currentRound++;
+          setupRound(currentRound);
+        }, 1000);
+      } else {
+        // 第三關結束後，顯示追蹤按鈕
+        setTimeout(() => {
+          gameStatus.textContent = `三關結束！共獲得 ${totalEarned} 元。還可追蹤 IG/FB 各 +50 元`;
+          followButtons.style.display = "block";
+        }, 1000);
+      }
+      confirmBtn.disabled = true;
+    }
+
+    // IG 按鈕：只給一次 +50，並開新視窗到指定連結
+    function followIG() {
+      if (!canFollowIG) return;
+      canFollowIG = false;
+      igBtn.disabled = true;
+      totalEarned += 50;
+      window.open(
+        "https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr",
+        "_blank"
+      );
+      gameStatus.textContent = `已追蹤 IG！額外獲得 50 元，總共 ${totalEarned} 元`;
+    }
+
+    // FB 按鈕：只給一次 +50，並開新視窗到指定連結
+    function followFB() {
+      if (!canFollowFB) return;
+      canFollowFB = false;
+      fbBtn.disabled = true;
+      totalEarned += 50;
+      window.open(
+        "https://www.facebook.com/share/19ZXhbVjJw/?mibextid=wwXIfr",
+        "_blank"
+      );
+      gameStatus.textContent = `已按讚 FB！額外獲得 50 元，總共 ${totalEarned} 元`;
+    }
+
+    // 離開/關閉小遊戲
+    exitGameBtn.addEventListener("click", () => {
+      gameModal.style.display = "none";
+      // 將遊戲所得加到剩餘 K 幣，再更新畫面
+      kcoin += totalEarned;
+      document.getElementById("kcoin").textContent = kcoin;
+      enableUpgradeButtons();
+      renderAllMatchingCards();
+    });
+
+    // 只有當玩家剩餘 K 幣 ≥ 10、且技能還沒滿，才解鎖升級按鈕
+    function enableUpgradeButtons() {
+      for (let key in skills) {
+        const upBtn = document.getElementById("up-" + key);
+        const downBtn = document.getElementById("down-" + key);
+        upBtn.disabled   = !(kcoin >= 10 && skills[key] < maxLevel);
+        downBtn.disabled = (skills[key] <= 1);
+      }
+    }
+
+    // ============== Modal 推薦卡片邏輯 ==============
+    const modalOverlay    = document.getElementById("recommendModal");
+    const modalName       = document.getElementById("modalName");
+    const modalImg        = document.getElementById("modalImg");
+    const modalDesc       = document.getElementById("modalDesc");
+    const modalPrice      = document.getElementById("modalPrice");
+    const modalTouch      = document.getElementById("modalTouch");
+    const modalDurability = document.getElementById("modalDurability");
+    const modalFlight     = document.getElementById("modalFlight");
+    const modalLook       = document.getElementById("modalLook");
+    const closeModalBtn   = document.getElementById("closeModalBtn");
+
+    // 關閉推薦 Modal
+    closeModalBtn.addEventListener("click", () => {
+      modalOverlay.style.display = "none";
+      renderAllMatchingCards();
+    });
+
+    // 每次技能或已花費 (spent) 更新，都檢查是否要彈推薦 Modal
+    function checkProductMatch() {
+      for (let prod of products) {
+        const matchSkill = (
+          skills.touch >= prod.touch &&
+          skills.durability >= prod.durability &&
+          skills.flight >= prod.flight &&
+          skills.look >= prod.look
+        );
+        // 只要 已花費 (spent) >= 售價，就顯示
+        const matchSpend = (spent >= prod.price);
+
+        if (matchSkill && !hasShownModalFor.has(prod.name)) {
+          hasShownModalFor.add(prod.name);
+          modalName.textContent       = prod.name;
+          modalImg.src                = prod.image;
+          modalImg.alt                = prod.name;
+          modalDesc.textContent       = prod.desc;
+          modalPrice.textContent      = prod.price;
+          modalTouch.textContent      = prod.touch;
+          modalDurability.textContent = prod.durability;
+          modalFlight.textContent     = prod.flight;
+          modalLook.textContent       = prod.look;
+          modalOverlay.style.display = "flex";
+          return; // 只先彈第一個符合條件的推薦
+        }
+      }
+      // 沒有新的「須彈窗」產品，就渲染所有符合「技能 或 已花費 ≥ 價格」的卡片
+      renderAllMatchingCards();
+    }
+
+    // 渲染下方「所有符合條件的產品卡片」
+    function renderAllMatchingCards() {
+      const p = document.getElementById("productDisplay");
+      p.innerHTML = ""; // 清空
+
+      products.forEach((prod) => {
+        const matchSkill = (
+          skills.touch >= prod.touch &&
+          skills.durability >= prod.durability &&
+          skills.flight >= prod.flight &&
+          skills.look >= prod.look
+        );
+        const matchSpend = (spent >= prod.price);
+
+        // 卡片條件：技能門檻或 已花費 ≥ 價格 其中之一
+        if (matchSkill || matchSpend) {
+          const cardHtml = `
+            <div class="product">
+              <h3>🎯 推薦給您：${prod.name}</h3>
+              <img src="${prod.image}" alt="${prod.name}">
+              <p><strong>商品名稱：</strong>KOMBO ${prod.name}</p>
+              <p>${prod.desc}</p>
+              <p><strong>售價：</strong>$${prod.price}/筒</p>
+              <p>
+                手感 Lv.${prod.touch} ｜ 
+                耐打 Lv.${prod.durability} ｜ 
+                飛行 Lv.${prod.flight} ｜ 
+                外觀 Lv.${prod.look}
+              </p>
+              <a href="${prod.link}" target="_blank">前往賣場</a>
+            </div>
+          `;
+          p.innerHTML += cardHtml;
+        }
+      });
+    }
+
+    // 首次載入：初始化畫面
+    window.addEventListener("DOMContentLoaded", () => {
+      loadSaved();
+      checkProductMatch();
+    });
   </script>
 </body>
 </html>
