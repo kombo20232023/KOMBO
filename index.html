@@ -689,18 +689,29 @@
     </div>
   `;
 
-  document.getElementById('cardPreview').innerHTML = html;
-}
-// 清除舊的隱藏卡片（避免重複）
+ const preview = document.getElementById('cardPreview');
+
+// 先清空原本預覽與隱藏
+preview.innerHTML = '';
 const old = document.getElementById('hiddenCard');
 if (old) old.remove();
 
-// 新增一個離畫面很遠的高畫質 DOM，用來抓圖
-document.body.insertAdjacentHTML('beforeend', `
-  <div id="hiddenCard" style="position:absolute; top:-9999px; left:-9999px;">
-    ${html}
-  </div>
-`);
+// 產生 DOM 元素
+const wrapper = document.createElement('div');
+wrapper.innerHTML = html;
+const cardElement = wrapper.firstElementChild;
+
+// 放入預覽區
+preview.appendChild(cardElement);
+
+// 複製一份隱藏版
+const hidden = cardElement.cloneNode(true);
+hidden.id = 'hiddenCard';
+hidden.style.position = 'absolute';
+hidden.style.top = '-9999px';
+hidden.style.left = '-9999px';
+document.body.appendChild(hidden);
+
 </script>
 
 
@@ -913,12 +924,6 @@ document.body.insertAdjacentHTML('beforeend', `
 
        // ============== 分享至 Instagram（或複製至剪貼簿） ==============
    function shareToInstagram() {
-  // 如果還沒產卡 → 自動先跑一次
-  if (!document.getElementById('hiddenCard')) {
-    generateSkillCard(); // 先自動產一次
-  }
-
-  // 再次取得隱藏卡片 DOM（保險）
   setTimeout(() => {
     const tempCard = document.getElementById('hiddenCard');
     if (!tempCard) {
@@ -948,11 +953,11 @@ document.body.insertAdjacentHTML('beforeend', `
         alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
       }
 
-      // 移除臨時 DOM（避免重複）
-      tempCard.remove();
+      tempCard.remove(); // 結束後清掉
     });
-  }, 100); // 稍微等待 DOM 插入完成
+  }, 100);
 }
+
 
 
 
