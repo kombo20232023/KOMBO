@@ -759,32 +759,21 @@
 
   <script>
   function downloadSkillCard() {
-  const card = document.getElementById('cardArea');
-
-  // 偵測是否為手機裝置
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const exportArea = document.getElementById('cardExportArea');
 
-  // 暫時關閉 transform（避免縮圖）
-  const originalTransform = card.style.transform;
-  card.style.transform = 'none';
-
-  html2canvas(card, { scale: 1 }).then(canvas => {
+  html2canvas(exportArea, { scale: 1 }).then(canvas => {
     const imageUrl = canvas.toDataURL("image/png");
 
-    // 還原 transform
-    card.style.transform = originalTransform;
-
     if (isMobile) {
-      // ✅ 手機 → 顯示圖片 + 長按儲存提示
       document.getElementById("cardPreview").innerHTML = `
         <div style="text-align:center; margin-bottom: 8px;">
           <p style="margin: 6px 0; font-weight: bold;">📸 長按圖片可儲存到相簿再分享</p>
         </div>
         <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;">
       `;
-      alert("請長按圖片 → 儲存到相簿後歡迎分享到IG 🧡");
+      alert("請長按圖片 → 儲存清晰版本");
     } else {
-      // ✅ 桌機 → 自動下載
       const link = document.createElement('a');
       link.download = 'KOMBO_技能卡.png';
       link.href = imageUrl;
@@ -792,6 +781,7 @@
     }
   });
 }
+
 
   </script>
 
