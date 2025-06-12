@@ -699,15 +699,16 @@
 
   <script>
   function downloadSkillCard() {
-    html2canvas(document.getElementById('cardArea'), {
-      scale: 1 // 讓下載時畫質高（3200x4800）
-    }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = 'KOMBO_技能卡.png';
-      link.href = canvas.toDataURL();
-      link.click();
-    });
-  }
+  html2canvas(document.getElementById('cardArea'), {
+    scale: 3,
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'KOMBO_技能卡.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  });
+}
   </script>
 
 <!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
@@ -908,8 +909,8 @@
     return;
   }
 
-  html2canvas(card, { scale: 1 }).then(canvas => {
-    const imageUrl = canvas.toDataURL("image/png");
+  html2canvas(card, { scale: 3, useCORS: true }).then(canvas => {
+  const imageUrl = canvas.toDataURL("image/png");
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     if (isMobile) {
