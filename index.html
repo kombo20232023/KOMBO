@@ -385,17 +385,21 @@
       cursor: pointer;
     }
     .color-grid {
-    display: flex;
-    flex-wrap: wrap;     /* ⭐ 小圓點會自動換行 */
-    gap: 8px;            /* 圓點之間的間距 */
-    margin-top: 8px;
-    }
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 392px;
+      justify-content: center;
+}
+
 
     @media screen and (max-width: 480px) {
   /* 縮小技能卡 */
   #cardArea {
-    transform: scale(0.8);
-    transform-origin: top center;
+     width: 640px;
+     height: 960px;
+     transform-origin: top center;
   }
 
   /* Intro、規則 modal 內文字排版 */
@@ -434,84 +438,16 @@
     width: auto;
   }
   .color-grid {
-      justify-content: center;
+    flex-wrap: nowrap;              /* 不換行 */
+    overflow-x: auto;               /* 可橫向滑動 */
+    max-width: 100%;                /* 滿版寬度 */
+    padding-bottom: 6px;            /* 避免滑動時被遮住 */
+    -webkit-overflow-scrolling: touch; /* 手機滑動更順 */
   }
 
-  /* ===== 下半區塊（技能卡產生區）的主結構包裝樣式 ===== */
-.card-controls {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-  margin-top: 40px;
-  padding: 20px;
-  background: rgba(255,255,255,0.85);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border-radius: 12px;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
-  flex-wrap: wrap;  /* ✅ 預防畫面過小時自動換行 */
-}
-
-/* 左側（輸入 + 顏色區） */
-.card-left {
-  flex: 1 1 300px;
-}
-
-/* 右側（按鈕） */
-.card-right {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 12px;
-  flex: 1 1 200px;
-  max-width: 250px;
-}
-
-/* 顏色選擇標題 */
-.color-label {
-  margin-top: 12px;
-  font-weight: bold;
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 6px;
-  text-align: left;
-}
-
-/* 下半區塊按鈕樣式統一 */
-.card-right button {
-  width: 100%;
-  padding: 12px;
-  font-size: 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* ✅ RWD 手機版：整區縱向排列，圓點置中 */
-@media screen and (max-width: 480px) {
-  .card-controls {
-    flex-direction: column;
-    padding: 16px;
+  .color-swatch {
+    flex: 0 0 auto;                 /* 每個圓點固定寬度 */
   }
-
-  .card-left,
-  .card-right {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .color-grid {
-    justify-content: center;
-  }
-
-  .card-right button {
-    font-size: 16px;
-  }
-}
-
 }
 
 </style>
@@ -600,7 +536,7 @@
   <div class="tools">
     <button onclick="openGame()">▶ 玩遊戲賺 K 幣（三關）</button>
     <button onclick="resetAll()">🔄 重置</button>
-    <button class="ig-share-btn" onclick="shareToInstagram()">📤 分享技能卡到 IG
+    <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
     </button>
   </div>
 
@@ -638,10 +574,12 @@
     margin-bottom: 16px;
   }
   .color-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      max-width: 392px;
+      justify-content: center;
   }
   .color-swatch {
     width: 32px;
@@ -688,19 +626,22 @@
     <div class="color-swatch" style="background-color:#5d3921;" data-img="咖啡.png"></div>
 </div>
 
-<div class="form-row">
+<div class="form-row" style="margin-top: 16px;">
   <label for="barColor">技能條顏色：</label>
   <input type="color" id="barColor" value="#0A574F" style="height: 32px; width: 60px; padding: 0; border: 1px solid #aaa;">
 </div>
 
-<!-- ✅ 固定放在 skillCardSection 裡，不被 script 蓋掉 -->
-<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 12px;">
-  <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
-  <button class="orange-btn" onclick="downloadSkillCard()">下載技能卡</button>
+<!-- ✅ 外層置中 + 內部按鈕左右排列 -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-top: 16px;">
+  <div style="display: flex; justify-content: center; gap: 16px;">
+    <button class="orange-btn" onclick="generateSkillCard()">產生技能卡</button>
+    <button class="orange-btn" onclick="shareToInstagram()">下載技能卡</button>
+  </div>
+
+  <!-- 預覽區 -->
+  <div id="cardPreview" style="display: flex; justify-content: center; margin-top: 20px;"></div>
 </div>
 
-<!-- 預覽區 -->
-<div id="cardPreview" style="margin-top: 20px;"></div>
 
 
 <script>
@@ -759,30 +700,15 @@
 
   <script>
   function downloadSkillCard() {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const exportArea = document.getElementById('cardExportArea');
-
-  html2canvas(exportArea, { scale: 1 }).then(canvas => {
-    const imageUrl = canvas.toDataURL("image/png");
-
-    if (isMobile) {
-      document.getElementById("cardPreview").innerHTML = `
-        <div style="text-align:center; margin-bottom: 8px;">
-          <p style="margin: 6px 0; font-weight: bold;">📸 長按圖片可儲存到相簿再分享</p>
-        </div>
-        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px; display: block; margin: 0 auto;">
-      `;
-      alert("請長按圖片 → 儲存清晰版本");
-    } else {
+    html2canvas(document.getElementById('cardArea'), {
+      scale: 1 // 讓下載時畫質高（3200x4800）
+    }).then(canvas => {
       const link = document.createElement('a');
       link.download = 'KOMBO_技能卡.png';
-      link.href = imageUrl;
+      link.href = canvas.toDataURL();
       link.click();
-    }
-  });
-}
-
-
+    });
+  }
   </script>
 
 <!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
@@ -990,10 +916,10 @@
     if (isMobile) {
       // 手機裝置：顯示圖片並提示用戶長按儲存
       document.getElementById("cardPreview").innerHTML = `
-        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
+        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿歡迎分享至 IG</strong></p>
         <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
       `;
-      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
+      alert("請長按圖片 → 儲存到相簿後歡迎分享至 IG 🧡");
     } else {
       // 桌機：直接觸發下載
       const link = document.createElement('a');
@@ -1364,4 +1290,3 @@ function startGame() {
   </script>
 </body>
 </html>
-
