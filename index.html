@@ -711,7 +711,7 @@ hidden.style.position = 'absolute';
 hidden.style.top = '-9999px';
 hidden.style.left = '-9999px';
 document.body.appendChild(hidden);
-
+}
 </script>
 
 
@@ -953,10 +953,11 @@ document.body.appendChild(hidden);
         alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
       }
 
-      tempCard.remove(); // 結束後清掉
+      tempCard.remove(); // 匯出後移除臨時 DOM
     });
-  }, 100);
+  }, 100); // 等待 DOM 安全產生完
 }
+
 
 
 
