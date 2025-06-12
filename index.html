@@ -900,9 +900,35 @@
       checkProductMatch();
     }
 
-    // ============== 分享至 Instagram（或複製至剪貼簿） ==============
-   
-  
+       // ============== 分享至 Instagram（或複製至剪貼簿） ==============
+   function shareToInstagram() {
+  const card = document.getElementById('cardArea');
+  if (!card) {
+    alert("請先點選「產生技能卡」再分享！");
+    return;
+  }
+
+  html2canvas(card, { scale: 1 }).then(canvas => {
+    const imageUrl = canvas.toDataURL("image/png");
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // 手機裝置：顯示圖片並提示用戶長按儲存
+      document.getElementById("cardPreview").innerHTML = `
+        <p style="margin-bottom:8px;"><strong>📸 長按圖片可儲存到相簿再分享至 IG</strong></p>
+        <img src="${imageUrl}" style="max-width: 100%; border: 2px solid #ccc; border-radius: 8px;">
+      `;
+      alert("請長按圖片 → 儲存到相簿後再自行分享至 IG 🧡");
+    } else {
+      // 桌機：直接觸發下載
+      const link = document.createElement('a');
+      link.download = 'KOMBO_技能卡.png';
+      link.href = imageUrl;
+      link.click();
+      alert("已自動下載技能卡📸\n\n可上傳圖片至 IG 分享！感謝支持 KOMBO 🧡");
+    }
+  });
+}
 
 
     // ============== 重新設定 & 存 / 載 本地化狀態 ==============
@@ -946,6 +972,7 @@
       checkProductMatch();     // 重新檢查推薦
       saveState();             // 存入 localStorage
     }
+ 
  
 
 
