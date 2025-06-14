@@ -449,6 +449,26 @@
   }
 }
 
+@keyframes flash-border {
+  0% { box-shadow: 0 0 0px gold; }
+  50% { box-shadow: 0 0 12px 4px gold; }
+  100% { box-shadow: 0 0 0px gold; }
+}
+
+.correct.flash {
+  animation: flash-border 1s ease-in-out 3;
+}
+
+.reward-status {
+  margin-top: 12px;
+  font-size: 16px;
+  color: #D35400;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.6;
+}
+
+
 </style>
 
 
@@ -740,9 +760,9 @@
       <button id="confirmBtn" onclick="confirmSelection()" disabled>確定</button>
       <p id="gameStatus"></p>
       <div id="followButtons">
-        <p>恭喜完成三關！還可額外加碼：</p>
-        <button id="igBtn" onclick="followIG()">追蹤 IG（+50 元）</button>
-        <button id="fbBtn" onclick="followFB()">按讚 FB（+50 元）</button>
+        <p>還可額外加碼：</p>
+        <button id="igBtn" onclick="followIG()">追蹤 IG（+50 K幣）</button>
+        <button id="fbBtn" onclick="followFB()">按讚 FB（+50 K幣）</button>
       </div>
       <button id="exitGameBtn">✕ 離開遊戲</button>
     </div>
@@ -755,8 +775,114 @@
 
   <!-- ===== 點擊音效 ===== -->
   <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_f7998b6be6.mp3?filename=click-124467.mp3"></audio>
+<script>
+  <!-- ===== 遊戲 ===== -->
+  const questionPool = [
+  {
+    type: "single",
+    question: "當發球員得分為零分或偶數時，發球員須站於哪一個球區發球?",
+    options: ["右發球區", "左發球區"],
+    answer: "右發球區",
+    reward: 50
+  },
+  {
+    type: "multi-image",
+    question: "選出台灣羽球選手？",
+    options: [], // ⚠️ 圖片尚未補，之後再加
+    maxSelect: 5,
+    rewardPerCorrect: 25
+  },
+  {
+    type: "single-image",
+    question: "此羽毛球圖為左手毛還是右手毛？",
+    image: "左手.jpg",
+    options: ["左手毛", "右手毛"],
+    answer: "左手毛",
+    reward: 50
+  },
+  {
+    type: "single",
+    question: "依照球速飛行距離由近到遠排序，何者正確？",
+    options: ["76-77-78", "77-78-76", "78-77-76", "78-76-77"],
+    answer: "76-77-78",
+    reward: 50
+  },
+  {
+    type: "single",
+    question: "KOMBO 產品中下列何者為鴨毛球？",
+    options: ["K5", "K5A", "KC", "K3A"],
+    answer: "K5",
+    reward: 50
+  },
+  {
+    type: "single-image",
+    question: "此圖為什麼球？",
+    image: "鵝毛.jpg",
+    options: ["鴨毛球", "鵝毛球", "雞毛球", "碳音球"],
+    answer: "鵝毛球",
+    reward: 50
+  },
+  {
+    type: "single",
+    question: "21分比賽制中，每局某方達到幾分時可以休息？",
+    options: ["9分", "10分", "11分", "12分"],
+    answer: "11分",
+    reward: 50
+  },
+  {
+    type: "single",
+    question: "普遍一顆羽毛球有幾根羽毛？",
+    options: ["14根", "16根", "17根", "15根"],
+    answer: "16根",
+    reward: 50
+  },
+  {
+    type: "single-image",
+    question: "圖中的人正在做什麼？",
+    image: "測飛行.jpg",
+    options: ["測球速", "測飛行", "測品質", "以上皆是"],
+    answer: "以上皆是",
+    reward: 50
+  },
+  {
+    type: "single",
+    question: "我們是誰？",
+    options: ["KOMBO", "KOMOB", "KMOBO", "KBOMO"],
+    answer: "KOMBO",
+    reward: 50
+  },
+  {
+    type: "single",
+    question: "下列何者正確？",
+    options: [
+      "單打的發球界線為較內側的底線那條",
+      "雙打的發球界線為較內側的底線那條",
+      "單打的接球界線為左右兩側的最外側",
+      "雙打的發球界線為較外側的底線那條"
+    ],
+    answer: "雙打的發球界線為較內側的底線那條",
+    reward: 50
+  },
+  {
+    type: "multi-image",
+    question: "選出 KOMBO 產品？",
+    options: [
+      { img: "K3.jpg", correct: true },
+      { img: "K3A.jpg", correct: true },
+      { img: "K5.jpg", correct: true },
+      { img: "K5A.jpg", correct: true },
+      { img: "K7pro.jpg", correct: true },
+      { img: "KC.jpg", correct: true },
+      { img: "sock.jpg", correct: true },
+      { img: "M.jpg", correct: true },
+      { img: "G.jpg", correct: true }
+    ],
+    maxSelect: 5,
+    rewardPerCorrect: 25
+  }
+];
 
-  <script>
+  
     // ============== 全局狀態 ==============
     let kcoin = 0;                     // 剩餘 K 幣，一開始為 0
     let spent = 450;                   // 已花費 K 幣，一開始為 450
@@ -1053,16 +1179,93 @@ function startGame() {
 
     // 打開小遊戲：初始化第一關
     function openGame() {
-      currentRound  = 1;
-      totalEarned   = 0;
-      canFollowIG   = true;
-      canFollowFB   = true;
-      igBtn.disabled = false;
-      fbBtn.disabled = false;
-      followButtons.style.display = "none";
-      setupRound(currentRound);
-      gameModal.style.display = "flex";
-    }
+  const shuffled = [...Array(11).keys()].sort(() => Math.random() - 0.5);
+  selectedRounds = [
+    questionPool[shuffled[0]],
+    questionPool[shuffled[1]],
+    questionPool[11] // 題目12固定放在第3關
+  ];
+  currentIndex = 0;
+  totalEarned = 0;
+  canFollowIG = true;
+  canFollowFB = true;
+  igBtn.disabled = false;
+  fbBtn.disabled = false;
+  followButtons.style.display = "none";
+  renderQuestion(selectedRounds[currentIndex]);
+  gameModal.style.display = "flex";
+}
+
+// 顯示題目
+function renderQuestion(q) {
+  gameStatus.textContent = "";
+  confirmBtn.disabled = true;
+  gridContainer.innerHTML = "";
+  selectedCount = 0;
+
+  // 題目文字
+  gameTitle.innerHTML = `第 ${currentIndex + 1} 題：${q.question}`;
+
+  if (q.type === "single") {
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "grid-button";
+      btn.textContent = opt;
+      btn.onclick = () => {
+        document.querySelectorAll(".grid-button").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        btn.dataset.selected = "true";
+        confirmBtn.disabled = false;
+      };
+      gridContainer.appendChild(btn);
+    });
+
+  } else if (q.type === "single-image") {
+    const img = document.createElement("img");
+    img.src = q.image;
+    img.style.maxWidth = "100%";
+    img.style.borderRadius = "8px";
+    img.style.marginBottom = "12px";
+    gridContainer.appendChild(img);
+
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "grid-button";
+      btn.textContent = opt;
+      btn.onclick = () => {
+        document.querySelectorAll(".grid-button").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        btn.dataset.selected = "true";
+        confirmBtn.disabled = false;
+      };
+      gridContainer.appendChild(btn);
+    });
+
+  } else if (q.type === "multi-image") {
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "grid-button";
+      btn.innerHTML = `<img src="${opt.img}" alt="圖${i + 1}">`;
+      btn.dataset.correct = opt.correct;
+      btn.dataset.selected = "false";
+      btn.onclick = () => {
+        const now = btn.dataset.selected === "true";
+        if (!now && selectedCount < q.maxSelect) {
+          btn.classList.add("selected");
+          btn.dataset.selected = "true";
+          selectedCount++;
+        } else if (now) {
+          btn.classList.remove("selected");
+          btn.dataset.selected = "false";
+          selectedCount--;
+        }
+        confirmBtn.disabled = (selectedCount < q.maxSelect);
+      };
+      gridContainer.appendChild(btn);
+    });
+  }
+}
+
 
     // 設定某一關的題目
     function setupRound(roundNum) {
@@ -1107,49 +1310,71 @@ function startGame() {
       gameTitle.textContent = `關卡 ${currentRound}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
     }
 
-    // 按下「確定」才揭曉本關答案並計分
+     // 顯示正解 + 加分
     function confirmSelection() {
-      const buttons = gridContainer.querySelectorAll(".grid-button");
-      let correctCountThisRound = 0;
+  const q = selectedRounds[currentIndex];
+  let earned = 0;
 
-      buttons.forEach(btn => {
-        const isCorrect = (btn.dataset.isCorrect === "true");
-        const isSelected = (btn.dataset.selected === "true");
-        if (isCorrect) {
-          // 正確的格子標示綠色
-          btn.classList.add("correct");
-          if (isSelected) {
-            correctCountThisRound++;
-          }
-        } else {
-          // 錯誤的格子如果被選到，標示紅色
-          if (isSelected) {
-            btn.classList.add("wrong");
-          }
-        }
-        // 無論如何都不能再切換
-        btn.onclick = null;
-      });
-
-      const gain = correctCountThisRound * 20;
-      totalEarned += gain;
-      gameStatus.textContent = `本關你選對 ${correctCountThisRound} 個，獲得 ${gain} 元！`;
-
-      // 如果不是最後一關，在 1 秒後載入下一關
-      if (currentRound < 3) {
-        setTimeout(() => {
-          currentRound++;
-          setupRound(currentRound);
-        }, 1000);
-      } else {
-        // 第三關結束後，顯示追蹤按鈕
-        setTimeout(() => {
-          gameStatus.textContent = `三關結束！共獲得 ${totalEarned} 元。還可追蹤 IG/FB 各 +50 元`;
-          followButtons.style.display = "block";
-        }, 1000);
-      }
-      confirmBtn.disabled = true;
+  if (q.type === "single" || q.type === "single-image") {
+    document.querySelectorAll(".grid-button").forEach(btn => {
+  if (btn.textContent === q.answer) {
+    btn.classList.add("correct", "flash"); // ✅ 加入閃爍動畫
+  } else if (btn.classList.contains("selected")) {
+    btn.classList.add("wrong");
+  }
+      btn.disabled = true;
+      btn.onclick = null;
+    });
+    const selected = document.querySelector(".grid-button.selected");
+    if (selected && selected.textContent === q.answer) {
+      earned = q.reward;
     }
+
+  } else if (q.type === "multi-image") {
+    const buttons = gridContainer.querySelectorAll(".grid-button");
+    buttons.forEach(btn => {
+      const isCorrect = btn.dataset.correct === "true";
+      const isSelected = btn.dataset.selected === "true";
+
+      if (isCorrect) btn.classList.add("correct", "flash");
+      if (isSelected && !isCorrect) btn.classList.add("wrong");
+
+      btn.onclick = null;
+    });
+
+    buttons.forEach(btn => {
+      const isCorrect = btn.dataset.correct === "true";
+      const isSelected = btn.dataset.selected === "true";
+      if (isCorrect && isSelected) earned += q.rewardPerCorrect;
+    });
+  }
+
+  totalEarned += earned;
+  gameStatus.innerHTML = `
+  <div class="reward-status">
+     本題獲得 ${earned} K幣
+  </div>
+`;
+
+if (q.type === "multi-image" && q.options.every(opt => opt.correct)) {
+  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是正確答案喔！</span>";
+}
+
+  confirmBtn.disabled = true;
+
+  // 下一題 or 結束
+  setTimeout(() => {
+    currentIndex++;
+    if (currentIndex < 3) {
+      renderQuestion(selectedRounds[currentIndex]);
+    } else {
+      gameStatus.innerHTML = `恭喜完成三關! 共獲得 <strong>${totalEarned} K幣</strong><br>`;
+    
+    followButtons.style.display = "block";  // ✅ 確保這行存在！
+}
+  }, 1200);
+}
+
 
     // IG 按鈕：只給一次 +50，並開新視窗到指定連結
     function followIG() {
