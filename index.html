@@ -468,6 +468,51 @@
   line-height: 1.6;
 }
 
+/* 單張圖片上方樣式 */
+#gridContainer.single-image-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 圖片題選項格子（由 JS 決定兩格還是四格） */
+.single-image-options {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* 單選題選項格子 */
+.single-options-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* 加上這兩個 class 控制幾欄 */
+.two {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 300px; /* 可依需要調整 */
+}
+.four {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* 選項按鈕變大、字體調整 */
+.grid-button {
+  font-size: 18px;
+  padding: 16px;
+  text-align: center;
+}
+
+.multi-image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* ⭐ 每列 3 個，形成 3x3 */
+  gap: 10px;
+  margin-top: 10px;
+}
 
 </style>
 
@@ -1207,6 +1252,11 @@ function renderQuestion(q) {
   gameTitle.innerHTML = `第 ${currentIndex + 1} 題：${q.question}`;
 
   if (q.type === "single") {
+    // 單選文字題（加外層排版容器）
+    const optionGrid = document.createElement("div");
+    optionGrid.className = "single-options-grid";
+    optionGrid.classList.add(q.options.length === 4 ? "four" : "two");
+
     q.options.forEach(opt => {
       const btn = document.createElement("button");
       btn.className = "grid-button";
@@ -1217,10 +1267,15 @@ function renderQuestion(q) {
         btn.dataset.selected = "true";
         confirmBtn.disabled = false;
       };
-      gridContainer.appendChild(btn);
+      optionGrid.appendChild(btn);
     });
 
+    gridContainer.appendChild(optionGrid);
+
   } else if (q.type === "single-image") {
+    // 單選圖片題
+    gridContainer.className = "single-image-layout";
+
     const img = document.createElement("img");
     img.src = q.image;
     img.style.maxWidth = "100%";
@@ -1228,6 +1283,10 @@ function renderQuestion(q) {
     img.style.marginBottom = "12px";
     gridContainer.appendChild(img);
 
+    const optionGrid = document.createElement("div");
+    optionGrid.className = "single-image-options";
+    optionGrid.classList.add(q.options.length === 4 ? "four" : "two");
+
     q.options.forEach(opt => {
       const btn = document.createElement("button");
       btn.className = "grid-button";
@@ -1238,10 +1297,16 @@ function renderQuestion(q) {
         btn.dataset.selected = "true";
         confirmBtn.disabled = false;
       };
-      gridContainer.appendChild(btn);
+      optionGrid.appendChild(btn);
     });
 
-  } else if (q.type === "multi-image") {
+    gridContainer.appendChild(optionGrid);
+
+    } else if (q.type === "multi-image") {
+    // 多選圖片題（加入 grid 容器）
+    const grid = document.createElement("div");
+    grid.className = "multi-image-grid";
+
     q.options.forEach((opt, i) => {
       const btn = document.createElement("button");
       btn.className = "grid-button";
@@ -1261,10 +1326,13 @@ function renderQuestion(q) {
         }
         confirmBtn.disabled = (selectedCount < q.maxSelect);
       };
-      gridContainer.appendChild(btn);
+      grid.appendChild(btn); // ✅ 塞進 3x3 容器
     });
+
+    gridContainer.appendChild(grid); // ✅ 插入整個容器
   }
 }
+
 
 
     // 設定某一關的題目
