@@ -536,9 +536,9 @@
       <p><strong>遊玩前的注意事項：</strong></p>
       <ol style="margin-left:20px;">
         <li>此評分系統僅供參考，為 KOMBO 內部統計資料，不代表每位球友的實際使用感受，請帶著<strong>輕鬆的心情遊玩</strong>！</li>
-        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本有調整，所有金額皆會有所變動。若小編來不及更新，還請大家見諒！</li>
+        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本有調整，所有金額皆會有所變動。若小幫手來不及更新，還請大家見諒！</li>
       </ol>
-      <p class="center-text">📩 小編不是本科生若有任何建議都歡迎  
+      <p class="center-text">📩 小幫手不是這行的若有任何建議都歡迎  
         <a href="https://lin.ee/syEA7iU" target="_blank">
           官方Line
         </a> 私訊我們喔！
@@ -1434,7 +1434,7 @@ function renderQuestion(q) {
 `;
 
 if (q.type === "multi-image" && q.options.every(opt => opt.correct)) {
-  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是正確答案喔！</span>";
+  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是我們的產品喔！</span>";
 }
 
   confirmBtn.disabled = true;
@@ -1463,7 +1463,7 @@ if (q.type === "multi-image" && q.options.every(opt => opt.correct)) {
         "https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr",
         "_blank"
       );
-      gameStatus.textContent = `已追蹤 IG！額外獲得 50 元，總共 ${totalEarned} 元`;
+      gameStatus.textContent = `已追蹤 IG！額外獲得 50 K幣，總共 ${totalEarned} K幣`;
     }
 
     // FB 按鈕：只給一次 +50，並開新視窗到指定連結
@@ -1476,7 +1476,7 @@ if (q.type === "multi-image" && q.options.every(opt => opt.correct)) {
         "https://www.facebook.com/share/19ZXhbVjJw/?mibextid=wwXIfr",
         "_blank"
       );
-      gameStatus.textContent = `已按讚 FB！額外獲得 50 元，總共 ${totalEarned} 元`;
+      gameStatus.textContent = `已按讚 FB！額外獲得 50 K幣，總共 ${totalEarned} K幣`;
     }
 
     // 離開/關閉小遊戲
