@@ -505,7 +505,16 @@
   font-size: 18px;
   padding: 16px;
   text-align: center;
+  min-width: 100px;   /* ✅ 最小寬度 */
+  min-height: 48px;   /* ✅ 最小高度 */
+  box-sizing: border-box;
 }
+
+.single-options-grid.four {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 260px;
+    margin: 0 auto;  /* ⭐ 水平置中 */
+  }
 
 .multi-image-grid {
   display: grid;
