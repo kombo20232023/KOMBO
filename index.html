@@ -475,53 +475,55 @@
   align-items: center;
 }
 
-/* 圖片題選項格子（由 JS 決定兩格還是四格） */
-.single-image-options {
+/* 通用選項容器樣式（文字 / 圖片） */
+.single-options-grid,
+.single-image-options,
+.multi-image-grid {
   display: grid;
   gap: 10px;
   margin-top: 10px;
   width: 100%;
+  justify-content: center;  /* ✅ 置中每列項目（多數時無影響） */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* 單選題選項格子 */
-.single-options-grid {
-  display: grid;
-  gap: 10px;
-  margin-top: 10px;
-  width: 100%;
-}
-
-/* 加上這兩個 class 控制幾欄 */
+/* 二選 or 四選佈局（2x2） */
 .two {
   grid-template-columns: repeat(2, 1fr);
-  max-width: 300px; /* 可依需要調整 */
+  max-width: 300px;
 }
 .four {
   grid-template-columns: repeat(2, 1fr);
+  max-width: 320px;
 }
 
-/* 選項按鈕變大、字體調整 */
+/* 多選 3x3 圖片題 */
+.multi-image-grid {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 360px;
+}
+
+/* 單一選項按鈕樣式統一 */
 .grid-button {
   font-size: 18px;
   padding: 16px;
   text-align: center;
-  min-width: 100px;   /* ✅ 最小寬度 */
-  min-height: 48px;   /* ✅ 最小高度 */
-  box-sizing: border-box;
+  word-break: break-word;
+  white-space: normal;
+  width: 100%;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.single-options-grid.four {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 260px;
-    margin: 0 auto;  /* ⭐ 水平置中 */
-  }
+/* 點選後樣式可另外定義 .selected */
 
-.multi-image-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* ⭐ 每列 3 個，形成 3x3 */
-  gap: 10px;
-  margin-top: 10px;
-}
 
 </style>
 
@@ -536,9 +538,9 @@
       <p><strong>遊玩前的注意事項：</strong></p>
       <ol style="margin-left:20px;">
         <li>此評分系統僅供參考，為 KOMBO 內部統計資料，不代表每位球友的實際使用感受，請帶著<strong>輕鬆的心情遊玩</strong>！</li>
-        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本有調整，所有金額皆會有所變動。若小幫手來不及更新，還請大家見諒！</li>
+        <li>所有價格為 <strong>2025.6.11</strong> 統計之結果，若未來毛片成本有調整，所有金額皆會有所變動。若小編來不及更新，還請大家見諒！</li>
       </ol>
-      <p class="center-text">📩 小幫手不是這行的若有任何建議都歡迎  
+      <p class="center-text">📩 小編不是本科生若有任何建議都歡迎  
         <a href="https://lin.ee/syEA7iU" target="_blank">
           官方Line
         </a> 私訊我們喔！
@@ -568,40 +570,40 @@
 </div>
   <!-- ===== LOGO & 已花費/剩餘 K 幣 ===== -->
   <img src="LOGO.jpg" class="logo" alt="KOMBO Logo">
-  <div class="spent">已花費 K 幣：<span id="spent">450</span> 元</div>
-  <div class="kcoin">剩餘 K 幣：<span id="kcoin">0</span> 元</div>
+  <div class="spent">已花費 K 幣：<span id="spent">450</span> K幣</div>
+  <div class="kcoin">剩餘 K 幣：<span id="kcoin">0</span> K幣</div>
 
   <!-- ===== 技能區 ===== -->
   <div class="skill-block">
     <div class="skill-name">手感</div>
     <div class="skill-level" id="lv-touch">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-touch" onclick="upgrade('touch')" disabled>升級（+10 元）</button>
-      <button class="btn downgrade" id="down-touch" onclick="downgrade('touch')" disabled>降級（-10 元）</button>
+      <button class="btn upgrade" id="up-touch" onclick="upgrade('touch')" disabled>升級（+10 K幣）</button>
+      <button class="btn downgrade" id="down-touch" onclick="downgrade('touch')" disabled>降級（-10 K幣）</button>
     </div>
   </div>
   <div class="skill-block">
     <div class="skill-name">耐打</div>
     <div class="skill-level" id="lv-durability">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-durability" onclick="upgrade('durability')" disabled>升級（+10 元）</button>
-      <button class="btn downgrade" id="down-durability" onclick="downgrade('durability')" disabled>降級（-10 元）</button>
+      <button class="btn upgrade" id="up-durability" onclick="upgrade('durability')" disabled>升級（+10 K幣）</button>
+      <button class="btn downgrade" id="down-durability" onclick="downgrade('durability')" disabled>降級（-10 K幣）</button>
     </div>
   </div>
   <div class="skill-block">
     <div class="skill-name">飛行</div>
     <div class="skill-level" id="lv-flight">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-flight" onclick="upgrade('flight')" disabled>升級（+10 元）</button>
-      <button class="btn downgrade" id="down-flight" onclick="downgrade('flight')" disabled>降級（-10 元）</button>
+      <button class="btn upgrade" id="up-flight" onclick="upgrade('flight')" disabled>升級（+10 K幣）</button>
+      <button class="btn downgrade" id="down-flight" onclick="downgrade('flight')" disabled>降級（-10 K幣）</button>
     </div>
   </div>
   <div class="skill-block">
     <div class="skill-name">外觀</div>
     <div class="skill-level" id="lv-look">Lv.1</div>
     <div class="btn-group">
-      <button class="btn upgrade" id="up-look" onclick="upgrade('look')" disabled>升級（+10 元）</button>
-      <button class="btn downgrade" id="down-look" onclick="downgrade('look')" disabled>降級（-10 元）</button>
+      <button class="btn upgrade" id="up-look" onclick="upgrade('look')" disabled>升級（+10 K幣）</button>
+      <button class="btn downgrade" id="down-look" onclick="downgrade('look')" disabled>降級（-10 K幣）</button>
     </div>
   </div>
 
@@ -1434,7 +1436,7 @@ function renderQuestion(q) {
 `;
 
 if (q.type === "multi-image" && q.options.every(opt => opt.correct)) {
-  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是我們的產品喔！</span>";
+  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是KOMBO的產品喔！</span>";
 }
 
   confirmBtn.disabled = true;
