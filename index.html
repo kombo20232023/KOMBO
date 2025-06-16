@@ -576,6 +576,19 @@
   object-fit: contain; /* ✅ 圖片不變形 */
 }
 
+.multi-text-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 兩欄 */
+  gap: 10px;
+  max-width: 340px; /* 避免超出 modal */
+  margin: 10px auto;
+  width: 100%;
+}
+
+
+
+
+
 </style>
 
 
@@ -660,7 +673,7 @@
 
   <!-- ===== 工具按鈕 ===== -->
   <div class="tools">
-    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（三關）</button>
+    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（五關）</button>
     <button onclick="resetAll()">🔄 重置</button>
     <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
     </button>
@@ -890,14 +903,24 @@
     question: "當發球員得分為零分或偶數時，發球員須站於哪一個球區發球?",
     options: ["右發球區", "左發球區"],
     answer: "右發球區",
-    reward: 50
+    reward: 25
   },
   {
-    type: "multi-image",
-    question: "選出台灣羽球選手？",
-    options: [], // ⚠️ 圖片尚未補，之後再加
-    maxSelect: 5,
-    rewardPerCorrect: 25
+    type: "multi-text",
+  question: "以下哪些是台灣羽球選手？（請選出 5 位）",
+  options: [
+    { text: "戴資穎", correct: true },
+    { text: "周天成", correct: true },
+    { text: "徐承宰", correct: false },
+    { text: "李洋", correct: true },
+    { text: "楊博涵", correct: true },
+    { text: "安洗瑩", correct: false },
+    { text: "志田千陽", correct: false },
+    { text: "王齊麟", correct: true },
+    { text: "松本麻佑", correct: false }
+  ],
+  maxSelect: 5,
+    rewardPerCorrect: 5  // ✅ 每答對 1 個給 5 K 幣
   },
   {
     type: "single-image",
@@ -905,21 +928,21 @@
     image: "左手.jpg",
     options: ["左手毛", "右手毛"],
     answer: "左手毛",
-    reward: 50
+    reward: 25
   },
   {
     type: "single",
     question: "依照球速飛行距離由近到遠排序，何者正確？",
     options: ["76-77-78", "77-78-76", "78-77-76", "78-76-77"],
     answer: "76-77-78",
-    reward: 50
+    reward: 25
   },
   {
     type: "single",
     question: "KOMBO 產品中下列何者為鴨毛球？",
     options: ["K5", "K5A", "KC", "K3A"],
     answer: "K5",
-    reward: 50
+    reward: 25
   },
   {
     type: "single-image",
@@ -927,21 +950,21 @@
     image: "鵝毛.jpg",
     options: ["鴨毛球", "鵝毛球", "雞毛球", "碳音球"],
     answer: "鵝毛球",
-    reward: 50
+    reward: 25
   },
   {
     type: "single",
     question: "21分比賽制中，每局某方達到幾分時可以休息？",
     options: ["9分", "10分", "11分", "12分"],
     answer: "11分",
-    reward: 50
+    reward: 25
   },
   {
     type: "single",
     question: "普遍一顆羽毛球有幾根羽毛？",
     options: ["14根", "16根", "17根", "15根"],
     answer: "16根",
-    reward: 50
+    reward: 25
   },
   {
     type: "single-image",
@@ -949,14 +972,14 @@
     image: "測飛行.jpg",
     options: ["測球速", "測飛行", "測品質", "以上皆是"],
     answer: "以上皆是",
-    reward: 50
+    reward: 25
   },
   {
     type: "single",
     question: "我們是誰？",
     options: ["KOMBO", "KOMOB", "KMOBO", "KBOMO"],
     answer: "KOMBO",
-    reward: 50
+    reward: 25
   },
   {
     type: "single",
@@ -968,7 +991,7 @@
       "雙打的發球界線為較外側的底線那條"
     ],
     answer: "雙打的發球界線為較內側的底線那條",
-    reward: 50
+    reward: 25
   },
   {
     type: "multi-image",
@@ -985,7 +1008,7 @@
       { img: "G.jpg", correct: true }
     ],
     maxSelect: 5,
-    rewardPerCorrect: 25
+    rewardPerCorrect: 5
   }
 ];
 
@@ -1286,12 +1309,14 @@ function startGame() {
 
     // 打開小遊戲：初始化第一關
     function openGame() {
-  const shuffled = [...Array(11).keys()].sort(() => Math.random() - 0.5);
-  selectedRounds = [
-    questionPool[shuffled[0]],
-    questionPool[shuffled[1]],
-    questionPool[11] // 題目12固定放在第3關
-  ];
+  const shuffled = [...Array(11).keys()].sort(() => Math.random() - 0.5); // 0~10 共11題
+selectedRounds = [
+  questionPool[shuffled[0]],
+  questionPool[shuffled[1]],
+  questionPool[shuffled[2]],
+  questionPool[shuffled[3]],
+  questionPool[11] // 第12題：固定 KOMBO 題
+];
   currentIndex = 0;
   totalEarned = 0;
   canFollowIG = true;
@@ -1392,8 +1417,38 @@ function renderQuestion(q) {
     });
 
     gridContainer.appendChild(grid); // ✅ 插入整個容器
+  
+     } else if (q.type === "multi-text") {
+    // ✅ 新增：多選文字題（如 9選5）
+    const grid = document.createElement("div");
+    grid.className = "multi-text-grid";
+
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "grid-button";
+      btn.textContent = opt.text;
+      btn.dataset.correct = opt.correct;
+      btn.dataset.selected = "false";
+      btn.onclick = () => {
+        const now = btn.dataset.selected === "true";
+        if (!now && selectedCount < q.maxSelect) {
+          btn.classList.add("selected");
+          btn.dataset.selected = "true";
+          selectedCount++;
+        } else if (now) {
+          btn.classList.remove("selected");
+          btn.dataset.selected = "false";
+          selectedCount--;
+        }
+        confirmBtn.disabled = (selectedCount < q.maxSelect);
+      };
+      grid.appendChild(btn);
+    });
+
+    gridContainer.appendChild(grid);
   }
 }
+
 
 
 
@@ -1447,11 +1502,11 @@ function renderQuestion(q) {
 
   if (q.type === "single" || q.type === "single-image") {
     document.querySelectorAll(".grid-button").forEach(btn => {
-  if (btn.textContent === q.answer) {
-    btn.classList.add("correct", "flash"); // ✅ 加入閃爍動畫
-  } else if (btn.classList.contains("selected")) {
-    btn.classList.add("wrong");
-  }
+      if (btn.textContent === q.answer) {
+        btn.classList.add("correct", "flash");
+      } else if (btn.classList.contains("selected")) {
+        btn.classList.add("wrong");
+      }
       btn.disabled = true;
       btn.onclick = null;
     });
@@ -1477,31 +1532,54 @@ function renderQuestion(q) {
       const isSelected = btn.dataset.selected === "true";
       if (isCorrect && isSelected) earned += q.rewardPerCorrect;
     });
+
+    const allCorrectSelected = Array.from(buttons).every(btn => {
+  return btn.dataset.correct === "true" && btn.dataset.selected === "true";
+});
+
+if (allCorrectSelected) {
+  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是KOMBO的產品喔！</span>";
+}
+
+  } else if (q.type === "multi-text") {
+    const buttons = gridContainer.querySelectorAll(".grid-button");
+    buttons.forEach(btn => {
+      const isCorrect = btn.dataset.correct === "true";
+      const isSelected = btn.dataset.selected === "true";
+
+      if (isCorrect) btn.classList.add("correct", "flash");
+      if (isSelected && !isCorrect) btn.classList.add("wrong");
+
+      btn.onclick = null;
+    });
+
+    buttons.forEach(btn => {
+      const isCorrect = btn.dataset.correct === "true";
+      const isSelected = btn.dataset.selected === "true";
+      if (isCorrect && isSelected) {
+        earned += q.rewardPerCorrect || 20; // 預設每題得 20 分
+      }
+    });
   }
 
   totalEarned += earned;
   gameStatus.innerHTML = `
-  <div class="reward-status">
-     本題獲得 ${earned} K幣
-  </div>
-`;
-
-if (q.type === "multi-image" && q.options.every(opt => opt.correct)) {
-  gameStatus.innerHTML += "<br><span style='color:#d35400; font-weight:bold;'>✅ 全部都是KOMBO的產品喔！</span>";
-}
+    <div class="reward-status">
+       本題獲得 ${earned} K幣
+    </div>
+  `;
 
   confirmBtn.disabled = true;
 
-  // 下一題 or 結束
   setTimeout(() => {
     currentIndex++;
-    if (currentIndex < 3) {
+    if (currentIndex < 5) {
       renderQuestion(selectedRounds[currentIndex]);
     } else {
-      gameStatus.innerHTML = `恭喜完成三關! 共獲得 <strong>${totalEarned} K幣</strong><br>`;
-    
-    followButtons.style.display = "block";  // ✅ 確保這行存在！
-}
+      gameStatus.innerHTML = `以上皆是我們所販售的產品哦！<br>🎉 恭喜完成五關！共獲得 <strong>${totalEarned} K幣</strong><br>`;
+
+      followButtons.style.display = "block";
+    }
   }, 1200);
 }
 
