@@ -675,6 +675,7 @@
   <div class="tools">
     <button onclick="openGame()">▶ 玩遊戲賺 K 幣（八關）</button>
     <button onclick="resetAll()">🔄 重置</button>
+    <button onclick="resetPlayedQuestions()">🧹 清除已玩過題目</button>
     <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
     </button>
   </div>
@@ -849,6 +850,8 @@
     link.click();
   });
 }
+
+
   </script>
 
 <!-- 須引入 html2canvas 套件（放在 body 結尾處） -->
@@ -1058,7 +1061,7 @@
 },
 {
   type: "single",
-  question: "目前比數12:15，慷柏隊的A球員發球，K隊的C球員接球，來回幾拍後，K隊的D球員殺球得分，比數變為12:16，請問接下來是誰發球？",
+  question: "目前比數12:15，慷柏隊的A球員發球，K隊的C球員接球，K隊的D球員殺球得分，比數變為12:16，請問接下來是誰發球？",
   options: ["慷柏隊的A球員繼續發球", "慷柏隊B球員發球", "K隊的C球員", "K隊的D球員"],
   answer: "K隊的C球員",
   reward: 25
@@ -1072,7 +1075,7 @@
 },
 {
   type: "single",
-  question: "誰在2024巴黎奧運有獲得金牌？",
+  question: "誰在2040巴黎奧運有獲得金牌？",
   options: ["昆拉武特·威提訕", "李洋和王齊麟", "梁偉鏗和王昶", "金元昊和鄭娜銀"],
   answer: "李洋和王齊麟",
   reward: 25
@@ -1119,22 +1122,22 @@
   reward: 50
 },
   {
-    type: "multi-image",
-    question: "選出 KOMBO 產品？",
-    options: [
-      { img: "K3.jpg", correct: true },
-      { img: "K3A.jpg", correct: true },
-      { img: "K5.jpg", correct: true },
-      { img: "K5A.jpg", correct: true },
-      { img: "K7PRO.jpg", correct: true },
-      { img: "KC.jpg", correct: true },
-      { img: "sock.jpg", correct: true },
-      { img: "M.jpg", correct: true },
-      { img: "G.jpg", correct: true }
-    ],
-    maxSelect: 5,
-    rewardPerCorrect: 5
-  }
+  type: "multi-image",
+  question: "選出 KOMBO 產品？",
+  options: [
+    { img: "K3.jpg", correct: true },
+    { img: "K3A.jpg", correct: true },
+    { img: "K5.jpg", correct: true },
+    { img: "K5A.jpg", correct: true },
+    { img: "K7PRO.jpg", correct: true },
+    { img: "KC.jpg", correct: true },
+    { img: "sock.jpg", correct: true },
+    { img: "M.jpg", correct: true },
+    { img: "G.jpg", correct: true }
+  ],
+  maxSelect: 9, // ✅ 改成 9
+  rewardPerCorrect: 5
+}
 ];
 
   
@@ -1149,7 +1152,8 @@
       flight: document.getElementById("lv-flight"),
       look: document.getElementById("lv-look")
     };
-
+// ✅ 加這行來記錄已玩過的題目
+let playedQuestionIndexes = JSON.parse(localStorage.getItem("kombo_played") || "[]");
     let soundOn = true;
     let hasShownModalFor = new Set();  // 紀錄已經彈過推薦 Modal 的產品
 
@@ -1431,20 +1435,42 @@ function startGame() {
         ]
       }
     };
+// ✅ 加在 script 區塊裡（openGame() 函式之前）
+function getPlayedIndexes() {
+  return JSON.parse(localStorage.getItem("kombo_played") || "[]");
+}
+
+function savePlayedIndexes(indexes) {
+  localStorage.setItem("kombo_played", JSON.stringify(indexes));
+}
 
     // 打開小遊戲：初始化第一關
-    function openGame() {
-  const shuffled = [...Array(25).keys()].sort(() => Math.random() - 0.5); // 0~24 隨機抽
-selectedRounds = [
-  questionPool[shuffled[0]],
-  questionPool[shuffled[1]],
-  questionPool[shuffled[2]],
-  questionPool[shuffled[3]],
-  questionPool[shuffled[4]],
-  questionPool[shuffled[5]],
-  questionPool[shuffled[6]],
-  questionPool[25] // 固定第 26 題：KOMBO 襪子題
-];
+ function openGame() {
+  const played = getPlayedIndexes();  // 拿已玩過題目
+
+  // 題庫 index 陣列（排除最後一題 KOMBO 收尾題）
+  const poolIndexes = [...Array(questionPool.length - 1).keys()];
+
+  // 從未玩過的題目中選出 7 題
+  const unused = poolIndexes.filter(i => !played.includes(i));
+  const selected = [];
+
+  // 如果未玩過題目 < 7 題，就混合已玩過的補足
+  if (unused.length >= 7) {
+    selected.push(...shuffle(unused).slice(0, 7));
+  } else {
+    selected.push(...shuffle(unused));
+    const stillNeed = 7 - unused.length;
+    const reused = shuffle(played).slice(0, stillNeed);
+    selected.push(...reused);
+  }
+
+  // 儲存本輪玩過的題目（扣掉 KOMBO 題）
+  savePlayedIndexes([...new Set([...played, ...selected])]);
+
+  // 塞入這輪要用的題目（+收尾 KOMBO 題）
+  selectedRounds = selected.map(i => questionPool[i]);
+  selectedRounds.push(questionPool[questionPool.length - 1]); // 最後一題固定
 
   currentIndex = 0;
   totalEarned = 0;
@@ -1457,6 +1483,13 @@ selectedRounds = [
   gameModal.style.display = "flex";
 }
 
+// 小工具：隨機打亂陣列
+function shuffle(arr) {
+  return arr.slice().sort(() => Math.random() - 0.5);
+}
+
+
+
 // 顯示題目
 function renderQuestion(q) {
   gameStatus.textContent = "";
@@ -1465,7 +1498,9 @@ function renderQuestion(q) {
   selectedCount = 0;
 
   // 題目文字
-  gameTitle.innerHTML = `第 ${currentIndex + 1} 題：${q.question}`;
+  gameTitle.innerHTML = `第 ${currentIndex + 1} 題：${q.question}` + 
+                      (q.maxSelect ? `（最多選 ${q.maxSelect} 個）` : "");
+
 
   if (q.type === "single") {
     // 單選文字題（加外層排版容器）
@@ -1540,7 +1575,7 @@ function renderQuestion(q) {
           btn.dataset.selected = "false";
           selectedCount--;
         }
-        confirmBtn.disabled = (selectedCount < q.maxSelect);
+        confirmBtn.disabled = (selectedCount < 1);
       };
       grid.appendChild(btn); // ✅ 塞進 3x3 容器
     });
@@ -1569,7 +1604,7 @@ function renderQuestion(q) {
           btn.dataset.selected = "false";
           selectedCount--;
         }
-        confirmBtn.disabled = (selectedCount < q.maxSelect);
+        confirmBtn.disabled = (selectedCount < 1);
       };
       grid.appendChild(btn);
     });
@@ -1587,7 +1622,7 @@ function renderQuestion(q) {
       selectedCount = 0;
       gameStatus.textContent = "";
       confirmBtn.disabled = true; 
-      gameTitle.textContent = `關卡 ${roundNum}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
+      gameTitle.textContent = `關卡 ${currentRound}：選出 KOMBO 產品（已選 ${selectedCount}/${q.maxSelect}）`;
       gridContainer.innerHTML = "";
 
       // 將九個選項隨機打亂順序再渲染
@@ -1620,10 +1655,14 @@ function renderQuestion(q) {
         btn.dataset.selected = "false";
         selectedCount--;
       }
-      confirmBtn.disabled = (selectedCount < 5);
-      gameTitle.textContent = `關卡 ${currentRound}：選出 5 個 KOMBO 產品（已選 ${selectedCount}/5）`;
+      confirmBtn.disabled = (selectedCount < q.maxSelect);
+      gameTitle.textContent = `關卡 ${currentRound}：選出 KOMBO 產品（已選 ${selectedCount}/${q.maxSelect}）`;
     }
-
+function resetPlayedQuestions() {
+  localStorage.removeItem("kombo_played");
+  playedQuestionIndexes = [];
+  alert("✅ 已清除已玩過的題目，下一輪將重新隨機選題！");
+}
      // 顯示正解 + 加分
     function confirmSelection() {
   const q = selectedRounds[currentIndex];
