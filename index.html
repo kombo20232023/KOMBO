@@ -673,7 +673,7 @@
 
   <!-- ===== 工具按鈕 ===== -->
   <div class="tools">
-    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（五關）</button>
+    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（八關）</button>
     <button onclick="resetAll()">🔄 重置</button>
     <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
     </button>
@@ -1434,14 +1434,18 @@ function startGame() {
 
     // 打開小遊戲：初始化第一關
     function openGame() {
-  const shuffled = [...Array(25).keys()].sort(() => Math.random() - 0.5); // 從 0~24 題中隨機抽 4 題
+  const shuffled = [...Array(25).keys()].sort(() => Math.random() - 0.5); // 0~24 隨機抽
 selectedRounds = [
   questionPool[shuffled[0]],
   questionPool[shuffled[1]],
   questionPool[shuffled[2]],
   questionPool[shuffled[3]],
-  questionPool[25] // 第 26 題固定出現：襪子題
+  questionPool[shuffled[4]],
+  questionPool[shuffled[5]],
+  questionPool[shuffled[6]],
+  questionPool[25] // 固定第 26 題：KOMBO 襪子題
 ];
+
   currentIndex = 0;
   totalEarned = 0;
   canFollowIG = true;
@@ -1698,10 +1702,10 @@ if (allCorrectSelected) {
 
   setTimeout(() => {
     currentIndex++;
-    if (currentIndex < 5) {
+    if (currentIndex < 8) {
       renderQuestion(selectedRounds[currentIndex]);
     } else {
-       gameStatus.innerHTML = `以上皆是我們所販售的產品！<br>恭喜完成五關！共獲得 <strong>${totalEarned} K幣</strong><br>`;
+       gameStatus.innerHTML = `以上皆是我們所販售的產品！<br>恭喜完成八關！共獲得 <strong>${totalEarned} K幣</strong><br>`;
       followButtons.style.display = "block";
     }
   }, 1200);
