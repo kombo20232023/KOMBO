@@ -673,12 +673,10 @@
 
   <!-- ===== 工具按鈕 ===== -->
   <div class="tools">
-    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（總共四輪）</button>
-    <button onclick="resetAll()">🔄 重置</button>
-    <button onclick="resetPlayedQuestions()">🧹 清除已玩過題目</button>
-    <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
-    </button>
-  </div>
+  <button onclick="openGame()">▶ 玩遊戲賺 K 幣（總共三輪）</button>
+  <button onclick="resetAllProgress()">🔄 重置所有進度</button>
+  <button onclick="window.open('https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr', '_blank')">💖 喜歡的話追蹤我們 IG 吧！</button>
+</div>
 
 
   <!-- ===== 產生技能卡區 ===== -->
@@ -943,7 +941,7 @@
       "以上皆是"
     ],
     answer: "球場為長方形而其所有界線寬度均為 40公釐",
-    reward: 12
+    reward: 10
   },
   {
     id: 4,
@@ -959,7 +957,7 @@
     question: "目前比數0:1，慷柏隊的B球員發球，請問誰負責接球？",
     options: ["站在正對面的K隊C球員", "站在斜對角的K隊D球員"],
     answer: "站在斜對角的K隊D球員",
-    reward: 5
+    reward: 10
   },
   {
     id: 6,
@@ -972,7 +970,7 @@
       "以上皆是"
     ],
     answer: "發球時，球由接發球員的搭擋拍擊",
-    reward: 5
+    reward: 10
   },
   {
     id: 7,
@@ -990,7 +988,7 @@
       { img: "G.jpg", correct: true }
     ],
     maxSelect: 9,
-    rewardPerCorrect: 2
+    rewardPerCorrect: 3
   },
   {
     id: 8,
@@ -1016,7 +1014,7 @@
     question: "我們是誰？",
     options: ["KOMBO", "KOMOB", "KMOBO", "KBOMO"],
     answer: "KOMBO",
-    reward: 12
+    reward: 10
   },
   {
     id: 10,
@@ -1046,7 +1044,7 @@
     question: "2024巴黎奧運誰獲得金牌？",
     options: ["昆拉武特·威提訕", "李洋和王齊麟", "梁偉鏗和王昶", "金元昊和鄭娜銀"],
     answer: "李洋和王齊麟",
-    reward: 5
+    reward: 10
   },
   {
     id: 13,
@@ -1055,7 +1053,7 @@
     image: "梁偉鏗.jpg",
     options: ["王昶", "李洋", "梁偉鏗", "蔡哥"],
     answer: "梁偉鏗",
-    reward: 5
+    reward: 10
   },
   {
     id: 14,
@@ -1074,7 +1072,7 @@
   image: "大小.jpg",
   options: ["幫羽球做SPA", "維持口徑大小", "羽毛球轉職中", "以上皆是"],
   answer: "維持口徑大小",
-  reward: 5
+  reward: 10
 },
   {
     id: 16,
@@ -1099,7 +1097,7 @@
     image: "測飛行.jpg",
     options: ["測球速", "測飛行", "測品質", "以上皆是"],
     answer: "以上皆是",
-    reward: 5
+    reward: 10
   },
   {
     id: 19,
@@ -1112,7 +1110,7 @@
       "毛片沒有分左右手"
     ],
     answer: "毛片比較大片的露於外側是左手毛",
-    reward: 12
+    reward: 10
   },
   {
     id: 20,
@@ -1161,7 +1159,7 @@
     question: "KOMBO 產品中下列何者為鴨毛球？",
     options: ["K5", "K5A", "KC", "K3A"],
     answer: "K5",
-    reward: 12
+    reward: 10
   },
   {
     id: 26,
@@ -1170,7 +1168,7 @@
     image: "鵝毛.jpg",
     options: ["鴨毛球", "鵝毛球", "雞毛球", "碳音球"],
     answer: "鵝毛球",
-    reward: 5
+    reward: 10
   },
   
  {
@@ -1180,7 +1178,7 @@
   image: "鴨毛.jpg",
   options: ["鵝毛", "鴨毛"],
   answer: "鴨毛",
-  reward: 5
+  reward: 10
 },
 {
     id: 28,
@@ -1200,15 +1198,16 @@
 
   // ✅ 題庫分組（加在這裡）
 const questionGroups = {
-  round1: [0, 1, 2, 3, 4, 5, 6, 7],
-  round2: [8, 9, 10, 11, 12, 13, 14, 7],
-  round3: [15, 16, 17, 18, 19, 20, 21, 7],
-  round4: [22, 23, 24, 25, 26, 27, 28, 7]
+  round1: [0, 1, 2, 3, 4, 5, 6, 16, 17, 19],
+  round2: [8, 9, 10, 11, 12, 13, 14, 15, 25],
+  round3: [18, 20, 21, 22, 23, 24, 26, 27, 28],
+  kombo: 7 // KOMBO 題固定為第 8 題
 };
+
 // ✅ 全域變數區
-const MAX_ROUNDS = 4;
+const MAX_ROUNDS = 3;
 const QUESTIONS_PER_ROUND = 8;
-const MAX_QUESTIONS = MAX_ROUNDS * QUESTIONS_PER_ROUND; //32
+const MAX_QUESTIONS = 24;
 const MAX_KCOIN = 320;
 
 let playedRounds = parseInt(localStorage.getItem("kombo_rounds") || "0");
@@ -1414,26 +1413,7 @@ let playedQuestionIndexes = JSON.parse(localStorage.getItem("kombo_played") || "
       renderAllMatchingCards();
     }
 
-    // ▶ **重置按鈕**：呼叫 loadSaved()，並關閉所有 Modal
-    function resetAll() {
-      // 將 spent 退還給 kcoin
-      kcoin += spent-450;
-      spent = 450;
-
-      // 重設技能為 Lv.1
-      skills.touch = skills.durability = skills.flight = skills.look = 1;
-
-      // 更新畫面
-      for (let key in skills) {
-        displayLv[key].textContent = "Lv.1";
-      }
-      document.getElementById("kcoin").textContent = kcoin;
-      document.getElementById("spent").textContent = spent;
-
-      enableUpgradeButtons();  // 重新啟用按鈕
-      checkProductMatch();     // 重新檢查推薦
-      saveState();             // 存入 localStorage
-    }
+   
  
  
 
@@ -1523,12 +1503,12 @@ function savePlayedIndexes(indexes) {
     // 打開小遊戲：初始化第一關
  function openGame() {
   if (playedRounds >= MAX_ROUNDS) {
-    alert("你已完成所有遊戲（共 4 輪 / 32 題）🎉\n請使用你的 K 幣創造專屬技能卡！");
+    alert("你已完成所有遊戲（共 3 輪 / 24 題）🎉\n請使用你的 K 幣創造專屬技能卡！");
     return;
   }
 
   // 根據目前輪數，對應題庫 key
-  const roundKey = `round${playedRounds + 1}`; // round1 ~ round4
+  const roundKey = `round${playedRounds + 1}`;
   const group = questionGroups[roundKey];
 
   if (!group) {
@@ -1537,14 +1517,15 @@ function savePlayedIndexes(indexes) {
   }
 
   // 隨機打亂該輪的前7題（不含固定的第8題）
-  const selected = shuffle(group.filter(id => id !== 7)).slice(0, 7);
+  const selected = shuffle(group).slice(0, 7); // 直接抽 7 題
   selectedRounds = selected.map(i => questionPool[i]);
-  selectedRounds.push(questionPool[7]); // 第8題固定為選KOMBO產品
-
-  // 更新進度狀態
-  // 更新進度狀態
+ selectedRounds.push(questionPool[questionGroups.kombo]);
 
 
+
+// ✅ 更新進度狀態
+playedRounds++;
+localStorage.setItem("kombo_rounds", playedRounds);
 
 
   currentIndex = 0;
@@ -1740,24 +1721,41 @@ function renderQuestion(q) {
       confirmBtn.disabled = (selectedCount < q.maxSelect);
       gameTitle.textContent = `關卡 ${currentRound}：選出 KOMBO 產品（已選 ${selectedCount}/${q.maxSelect}）`;
     }
-function resetPlayedQuestions() {
-  localStorage.removeItem("kombo_played");
-  playedQuestionIndexes = [];
 
-  // ✅ 新增：同步清除輪數、完成題數與 IG/FB 紀錄
+function resetAllProgress() {
+  // 清除 localStorage 所有紀錄
+  localStorage.removeItem("kombo_played");
   localStorage.removeItem("kombo_rounds");
   localStorage.removeItem("kombo_questions");
   localStorage.removeItem("kombo_ig");
   localStorage.removeItem("kombo_fb");
+  localStorage.removeItem("kombo_skills");
 
+  // 重設狀態變數
   playedRounds = 0;
   totalQuestionsCompleted = 0;
   igUsed = false;
   fbUsed = false;
-   kcoin = 0;
-  document.getElementById("kcoin").textContent = 0;
+  kcoin = 0;
+  spent = 450;
+  hasShownModalFor.clear();
 
-  alert("✅ 已清除所有進度，下一輪將重新開始!");
+  // 重設技能
+  for (let key in skills) {
+    skills[key] = 1;
+    displayLv[key].textContent = "Lv.1";
+    document.getElementById("up-" + key).disabled = true;
+    document.getElementById("down-" + key).disabled = true;
+  }
+
+  // 更新畫面文字
+  document.getElementById("kcoin").textContent = kcoin;
+  document.getElementById("spent").textContent = spent;
+
+  // 重渲染卡片
+  renderAllMatchingCards();
+
+  alert("✅ 所有紀錄已重置，可重新開始遊戲！");
 }
 
      // 顯示正解 + 加分
@@ -1849,10 +1847,6 @@ localStorage.setItem("kombo_questions", totalQuestionsCompleted);
     if (currentIndex < 8) {
       renderQuestion(selectedRounds[currentIndex]);
       } else {
-  // 👇 這裡加上：
-  playedRounds++;
-  localStorage.setItem("kombo_rounds", playedRounds);
-
        gameStatus.innerHTML = `以上皆是我們所販售的產品！<br>恭喜完成本輪題目！共獲得 <strong>${totalEarned} K幣</strong><br>`;
       followButtons.style.display = "block";
     }
