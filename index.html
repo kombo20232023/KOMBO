@@ -1069,9 +1069,9 @@
 
  {
   id: 15,
-  type: "single",
+  type: "single-image",
   question: "這張照片的用意是什麼？",
-  image: "口徑.jpg",
+  image: "大小.jpg",
   options: ["幫羽球做SPA", "維持口徑大小", "羽毛球轉職中", "以上皆是"],
   answer: "維持口徑大小",
   reward: 5
@@ -1863,7 +1863,7 @@ localStorage.setItem("kombo_questions", totalQuestionsCompleted);
   if (!igUsed && kcoin < MAX_KCOIN) {
     igUsed = true;
     localStorage.setItem("kombo_ig", "true");
-    const bonus = Math.min(50, MAX_KCOIN - kcoin);
+    const bonus = Math.min(30, MAX_KCOIN - kcoin);
     totalEarned += bonus;
     kcoin += bonus;
     igBtn.disabled = true;
@@ -1879,7 +1879,7 @@ localStorage.setItem("kombo_questions", totalQuestionsCompleted);
   if (!fbUsed && kcoin < MAX_KCOIN) {
     fbUsed = true;
     localStorage.setItem("kombo_fb", "true");
-    const bonus = Math.min(50, MAX_KCOIN - kcoin);
+    const bonus = Math.min(30, MAX_KCOIN - kcoin);
     totalEarned += bonus;
     kcoin += bonus;
     fbBtn.disabled = true;
