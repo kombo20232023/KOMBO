@@ -886,8 +886,8 @@
       <p id="gameStatus"></p>
       <div id="followButtons">
         <p>還可額外加碼：</p>
-        <button id="igBtn" onclick="followIG()">追蹤 IG（+30 K幣）</button>
-        <button id="fbBtn" onclick="followFB()">按讚 FB（+30 K幣）</button>
+        <button id="igBtn" onclick="followIG()">追蹤 IG（+50 K幣）</button>
+        <button id="fbBtn" onclick="followFB()">按讚 FB（+50 K幣）</button>
       </div>
       <button id="exitGameBtn">✕ 離開遊戲</button>
     </div>
@@ -1865,7 +1865,7 @@ localStorage.setItem("kombo_questions", totalQuestionsCompleted);
   if (!igUsed && kcoin < MAX_KCOIN) {
     igUsed = true;
     localStorage.setItem("kombo_ig", "true");
-    const bonus = Math.min(30, MAX_KCOIN - kcoin);
+    const bonus = Math.min(50, MAX_KCOIN - kcoin);
     totalEarned += bonus;
     kcoin += bonus;
     igBtn.disabled = true;
@@ -1881,7 +1881,7 @@ localStorage.setItem("kombo_questions", totalQuestionsCompleted);
   if (!fbUsed && kcoin < MAX_KCOIN) {
     fbUsed = true;
     localStorage.setItem("kombo_fb", "true");
-    const bonus = Math.min(30, MAX_KCOIN - kcoin);
+    const bonus = Math.min(50, MAX_KCOIN - kcoin);
     totalEarned += bonus;
     kcoin += bonus;
     fbBtn.disabled = true;
