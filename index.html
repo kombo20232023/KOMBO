@@ -673,7 +673,7 @@
 
   <!-- ===== 工具按鈕 ===== -->
   <div class="tools">
-    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（八關）</button>
+    <button onclick="openGame()">▶ 玩遊戲賺 K 幣（總共四輪）</button>
     <button onclick="resetAll()">🔄 重置</button>
     <button onclick="resetPlayedQuestions()">🧹 清除已玩過題目</button>
     <button class="ig-share-btn" onclick="shareToInstagram()" hidden>📤 分享技能卡到 IG</button>
@@ -877,6 +877,8 @@
   <div id="gameModal">
     <div id="gameContent">
       <h3 id="gameTitle">關卡 1：選出 KOMBO 產品 （還剩 <span id="needCount">5</span> 個）</h3>
+      <p id="progressTracker" style="margin:8px 0; font-size:14px; color:#555;"></p>
+
       <div class="grid-container" id="gridContainer">
         <!-- JS 會動態插入 3×3 的按鈕（圖片） -->
       </div>
@@ -884,8 +886,8 @@
       <p id="gameStatus"></p>
       <div id="followButtons">
         <p>還可額外加碼：</p>
-        <button id="igBtn" onclick="followIG()">追蹤 IG（+50 K幣）</button>
-        <button id="fbBtn" onclick="followFB()">按讚 FB（+50 K幣）</button>
+        <button id="igBtn" onclick="followIG()">追蹤 IG（+30 K幣）</button>
+        <button id="fbBtn" onclick="followFB()">按讚 FB（+30 K幣）</button>
       </div>
       <button id="exitGameBtn">✕ 離開遊戲</button>
     </div>
@@ -902,101 +904,23 @@
   <!-- ===== 遊戲 ===== -->
   const questionPool = [
   {
+    id: 0,
     type: "single",
     question: "當發球員得分為零分或偶數時，發球員須站於哪一個球區發球?",
     options: ["右發球區", "左發球區"],
     answer: "右發球區",
-    reward: 25
+    reward: 10
   },
   {
-    type: "multi-text",
-  question: "以下哪些是台灣羽球選手？（請選出 5 位）",
-  options: [
-    { text: "戴資穎", correct: true },
-    { text: "周天成", correct: true },
-    { text: "福島由紀", correct: false },
-    { text: "李洋", correct: true },
-    { text: "楊博涵", correct: true },
-    { text: "王昶", correct: false },
-    { text: "志田千陽", correct: false },
-    { text: "王齊麟", correct: true },
-    { text: "松山奈未", correct: false }
-  ],
-  maxSelect: 5,
-    rewardPerCorrect: 5  // ✅ 每答對 1 個給 5 K 幣
-  },
-  {
-    type: "single-image",
-    question: "此羽毛球圖為左手毛還是右手毛？",
-    image: "左手.jpg",
-    options: ["左手毛", "右手毛"],
-    answer: "左手毛",
-    reward: 25
-  },
-  {
-    type: "single",
-    question: "依照球速飛行距離由近到遠排序，何者正確？",
-    options: ["76-77-78", "77-78-76", "78-77-76", "78-76-77"],
-    answer: "76-77-78",
-    reward: 25
-  },
-  {
-    type: "single",
-    question: "KOMBO 產品中下列何者為鴨毛球？",
-    options: ["K5", "K5A", "KC", "K3A"],
-    answer: "K5",
-    reward: 25
-  },
-  {
-  type: "single",
-  question: "關於 KOMBO 的襪子何者正確？",
-  options: [
-    "腳底矽膠止滑",
-    "足弓透氣加壓",
-    "容易咬腳的地方都有做加厚設計",
-    "以上皆是"
-  ],
-  answer: "以上皆是",
-  reward: 25
-},
-  {
-    type: "single-image",
-    question: "此圖為什麼球？",
-    image: "鵝毛.jpg",
-    options: ["鴨毛球", "鵝毛球", "雞毛球", "碳音球"],
-    answer: "鵝毛球",
-    reward: 25
-  },
-  {
+    id: 1,
     type: "single",
     question: "21分比賽制中，每局某方達到幾分時可以休息？",
     options: ["9分", "10分", "11分", "12分"],
     answer: "11分",
-    reward: 25
+    reward: 10
   },
   {
-    type: "single",
-    question: "普遍一顆羽毛球有幾根羽毛？",
-    options: ["14根", "16根", "17根", "15根"],
-    answer: "16根",
-    reward: 25
-  },
-  {
-    type: "single-image",
-    question: "圖中的人正在做什麼？",
-    image: "測飛行.jpg",
-    options: ["測球速", "測飛行", "測品質", "以上皆是"],
-    answer: "以上皆是",
-    reward: 25
-  },
-  {
-    type: "single",
-    question: "我們是誰？",
-    options: ["KOMBO", "KOMOB", "KMOBO", "KBOMO"],
-    answer: "KOMBO",
-    reward: 25
-  },
-  {
+    id: 2,
     type: "single",
     question: "下列何者正確？",
     options: [
@@ -1006,28 +930,260 @@
       "雙打的發球界線為較外側的底線那條"
     ],
     answer: "雙打的發球界線為較內側的底線那條",
-    reward: 25
+    reward: 10
   },
   {
+    id: 3,
+    type: "single",
+    question: "下列關於羽球場地何者正確？",
+    options: [
+      "球場為長方形而其所有界線寬度均為 40公釐",
+      "球場劃定界線只能白色，以利辨別",
+      "球網深度為 760公釐而寬度至少 7.1公尺。",
+      "以上皆是"
+    ],
+    answer: "球場為長方形而其所有界線寬度均為 40公釐",
+    reward: 12
+  },
+  {
+    id: 4,
+    type: "single",
+    question: "目前比數12:15，慷柏隊的A球員發球，K隊的C球員接球，來回多拍後，K隊的D球員殺球得分，比數變為12:16，請問接下來是誰發球？",
+    options: ["慷柏隊的A球員繼續發球", "慷柏隊B球員發球", "K隊的C球員", "K隊的D球員"],
+    answer: "K隊的C球員",
+    reward: 10
+  },
+  {
+    id: 5,
+    type: "single",
+    question: "目前比數0:1，慷柏隊的B球員發球，請問誰負責接球？",
+    options: ["站在正對面的K隊C球員", "站在斜對角的K隊D球員"],
+    answer: "站在斜對角的K隊D球員",
+    reward: 5
+  },
+  {
+    id: 6,
+    type: "single",
+    question: "下列哪一個情況算是犯規？",
+    options: [
+      "比賽時球拍突然斷網跑下場換球拍",
+      "進攻方擊球，球擦過球網後落在對手場地",
+      "發球時，球由接發球員的搭擋拍擊",
+      "以上皆是"
+    ],
+    answer: "發球時，球由接發球員的搭擋拍擊",
+    reward: 5
+  },
+  {
+    id: 7,
+    type: "multi-image",
+    question: "選出 KOMBO 產品？",
+    options: [
+      { img: "K3.jpg", correct: true },
+      { img: "K3A.jpg", correct: true },
+      { img: "K5.jpg", correct: true },
+      { img: "K5A.jpg", correct: true },
+      { img: "K7PRO.jpg", correct: true },
+      { img: "KC.jpg", correct: true },
+      { img: "sock.jpg", correct: true },
+      { img: "M.jpg", correct: true },
+      { img: "G.jpg", correct: true }
+    ],
+    maxSelect: 9,
+    rewardPerCorrect: 2
+  },
+  {
+    id: 8,
+    type: "multi-text",
+    question: "以下哪些是台灣羽球選手？（請選出 5 位）",
+    options: [
+      { text: "戴資穎", correct: true },
+      { text: "周天成", correct: true },
+      { text: "福島由紀", correct: false },
+      { text: "李洋", correct: true },
+      { text: "楊博涵", correct: true },
+      { text: "王昶", correct: false },
+      { text: "志田千陽", correct: false },
+      { text: "王齊麟", correct: true },
+      { text: "松山奈未", correct: false }
+    ],
+    maxSelect: 5,
+    rewardPerCorrect: 2
+  },
+  {
+    id: 9,
+    type: "single",
+    question: "我們是誰？",
+    options: ["KOMBO", "KOMOB", "KMOBO", "KBOMO"],
+    answer: "KOMBO",
+    reward: 12
+  },
+  {
+    id: 10,
+    type: "single",
+    question: "關於 KOMBO 的襪子何者正確？",
+    options: [
+      "腳底矽膠止滑",
+      "足弓透氣加壓",
+      "容易咬腳的地方都有做加厚設計",
+      "以上皆是"
+    ],
+    answer: "以上皆是",
+    reward: 10
+  },
+  {
+    id: 11,
+    type: "single-image",
+    question: "圖中的人是誰？",
+    image: "志田.jpg",
+    options: ["福島由紀", "松山奈未", "志田千陽", "我老婆"],
+    answer: "志田千陽",
+    reward: 10
+  },
+  {
+    id: 12,
+    type: "single",
+    question: "2024巴黎奧運誰獲得金牌？",
+    options: ["昆拉武特·威提訕", "李洋和王齊麟", "梁偉鏗和王昶", "金元昊和鄭娜銀"],
+    answer: "李洋和王齊麟",
+    reward: 5
+  },
+  {
+    id: 13,
+    type: "single-image",
+    question: "圖中的人是誰？",
+    image: "梁偉鏗.jpg",
+    options: ["王昶", "李洋", "梁偉鏗", "蔡哥"],
+    answer: "梁偉鏗",
+    reward: 5
+  },
+  {
+    id: 14,
+    type: "single",
+    question: "2020年東京奧運誰沒有獲得獎牌？",
+    options: ["李洋和王齊麟", "戴資穎", "渡邊勇大和東野有紗", "梁偉鏗和王昶"],
+    answer: "梁偉鏗和王昶",
+    reward: 10
+  },
+
+
+ {
+  id: 15,
   type: "single",
-  question: "哪一個溫度下77速度球最慢？",
-  options: ["8度", "15度", "30度", "25度"],
-  answer: "8度",
-  reward: 50
+  question: "這張照片的用意是什麼？",
+  image: "口徑.jpg",
+  options: ["幫羽球做SPA", "維持口徑大小", "羽毛球轉職中", "以上皆是"],
+  answer: "維持口徑大小",
+  reward: 5
+},
+  {
+    id: 16,
+    type: "single",
+    question: "依照球速飛行距離由近到遠排序，何者正確？",
+    options: ["76-77-78", "77-78-76", "78-77-76", "78-76-77"],
+    answer: "76-77-78",
+    reward: 10
+  },
+  {
+    id: 17,
+    type: "single",
+    question: "普遍一顆羽毛球有幾根羽毛？",
+    options: ["14根", "16根", "17根", "15根"],
+    answer: "16根",
+    reward: 10
+  },
+  {
+    id: 18,
+    type: "single-image",
+    question: "圖中的人正在做什麼？",
+    image: "測飛行.jpg",
+    options: ["測球速", "測飛行", "測品質", "以上皆是"],
+    answer: "以上皆是",
+    reward: 5
+  },
+  {
+    id: 19,
+    type: "single",
+    question: "對於毛片的敘述何者正確？",
+    options: [
+      "毛片比較大片的露於外側是右手毛",
+      "毛片比較大片的露於外側是左手毛",
+      "毛片比較小片的露於外側是左手毛",
+      "毛片沒有分左右手"
+    ],
+    answer: "毛片比較大片的露於外側是左手毛",
+    reward: 12
+  },
+  {
+    id: 20,
+    type: "single",
+    question: "為什麼鴨毛在冬天比較不耐打？",
+    options: ["毛桿較軟", "毛桿實心", "毛桿空心", "以上皆不影響"],
+    answer: "毛桿實心",
+    reward: 10
+  },
+  {
+    id: 21,
+    type: "single",
+    question: "下面哪一個工藝攸關飛行速度？",
+    options: ["球頭重量", "口徑", "毛片重量", "以上皆是"],
+    answer: "以上皆是",
+    reward: 10
+  },
+  {
+    id: 22,
+    type: "single",
+    question: "哪一個溫度下羽球相對耐打？",
+    options: ["寒流來10度", "夏日高溫35度", "秋天20度", "都一樣耐打"],
+    answer: "夏日高溫35度",
+    reward: 10
+  },
+  {
+    id: 23,
+    type: "single",
+    question: "哪一個溫度下77速度球最慢？",
+    options: ["8度", "15度", "30度", "25度"],
+    answer: "8度",
+    reward: 10
+  },
+  {
+    id: 24,
+    type: "single-image",
+    question: "此羽毛球圖為左手毛還是右手毛？",
+    image: "左手.jpg",
+    options: ["左手毛", "右手毛"],
+    answer: "左手毛",
+    reward: 10
+  },
+  {
+    id: 25,
+    type: "single",
+    question: "KOMBO 產品中下列何者為鴨毛球？",
+    options: ["K5", "K5A", "KC", "K3A"],
+    answer: "K5",
+    reward: 12
+  },
+  {
+    id: 26,
+    type: "single-image",
+    question: "此圖為什麼球？",
+    image: "鵝毛.jpg",
+    options: ["鴨毛球", "鵝毛球", "雞毛球", "碳音球"],
+    answer: "鵝毛球",
+    reward: 5
+  },
+  
+ {
+  id: 27,
+  type: "single-image",
+  question: "此圖是什麼毛？",
+  image: "鴨毛.jpg",
+  options: ["鵝毛", "鴨毛"],
+  answer: "鴨毛",
+  reward: 5
 },
 {
-  type: "single",
-  question: "對於毛片的敘述何者正確？",
-  options: [
-    "毛片比較大片的露於外側是右手毛",
-    "毛片比較大片的露於外側是左手毛",
-    "毛片比較小片的露於外側是左手毛",
-    "毛片沒有分左右手"
-  ],
-  answer: "毛片比較大片的露於外側是左手毛",
-  reward: 25
-},
-{
+    id: 28,
   type: "single",
   question: "下列敘述何者正確？",
   options: [
@@ -1037,111 +1193,31 @@
     "以上皆非"
   ],
   answer: "鴨毛毛桿是實心的",
-  reward: 25
-},
-{
-  type: "single-image",
-  question: "圖中的人是誰？",
-  image: "志田.jpg",
-  options: ["福島由紀", "松山奈未", "志田千陽", "我老婆"],
-  answer: "志田千陽",
-  reward: 25
-},
-{
-  type: "single",
-  question: "下列關於羽球場地何者正確？",
-  options: [
-    "球場為長方形而其所有界線寬度均為 40公釐",
-    "球場劃定界線只能白色，以利辨別",
-    "球網深度為 760公釐而寬度至少 7.1公尺。",
-    "以上皆是"
-  ],
-  answer: "球場為長方形而其所有界線寬度均為 40公釐",
-  reward: 25
-},
-{
-  type: "single",
-  question: "目前比數12:15，慷柏隊的A球員發球，K隊的C球員接球，K隊的D球員殺球得分，比數變為12:16，請問接下來是誰發球？",
-  options: ["慷柏隊的A球員繼續發球", "慷柏隊B球員發球", "K隊的C球員", "K隊的D球員"],
-  answer: "K隊的C球員",
-  reward: 25
-},
-{
-  type: "single",
-  question: "目前比數0:1，慷柏隊的B球員發球，請問誰負責接球？",
-  options: ["站在正對面的K隊C球員", "站在斜對角的K隊D球員"],
-  answer: "站在斜對角的K隊D球員",
-  reward: 25
-},
-{
-  type: "single",
-  question: "誰在2040巴黎奧運有獲得金牌？",
-  options: ["昆拉武特·威提訕", "李洋和王齊麟", "梁偉鏗和王昶", "金元昊和鄭娜銀"],
-  answer: "李洋和王齊麟",
-  reward: 25
-},
-{
-  type: "single",
-  question: "為什麼鴨毛在冬天比較不耐打？",
-  options: ["毛桿較軟", "毛桿實心", "毛桿空心", "以上皆不影響"],
-  answer: "毛桿實心",
-  reward: 25
-},
-{
-  type: "single-image",
-  question: "此圖是什麼毛？",
-  image: "鴨毛.jpg",
-  options: ["鵝毛", "鴨毛"],
-  answer: "鴨毛",
-  reward: 50
-},
-{
-  type: "single",
-  question: "下面哪一個工藝攸關飛行速度？",
-  options: ["球頭重量", "口徑", "毛片重量", "以上皆是"],
-  answer: "以上皆是",
-  reward: 25
-},
-{
-  type: "single",
-  question: "下列哪一個情況算是犯規？",
-  options: [
-    "比賽時球拍突然斷網跑下場換球拍",
-    "進攻方擊球，球擦過球網後落在對手場地",
-    "發球時，球由接發球員的搭擋拍擊",
-    "以上皆是"
-  ],
-  answer: "發球時，球由接發球員的搭擋拍擊",
-  reward: 25
-},
-{
-  type: "single",
-  question: "哪一個溫度下羽球相對耐打？",
-  options: ["寒流來10度", "夏日高溫35度", "秋天20度", "都一樣耐打"],
-  answer: "夏日高溫35度",
-  reward: 50
-},
-  {
-  type: "multi-image",
-  question: "選出 KOMBO 產品？",
-  options: [
-    { img: "K3.jpg", correct: true },
-    { img: "K3A.jpg", correct: true },
-    { img: "K5.jpg", correct: true },
-    { img: "K5A.jpg", correct: true },
-    { img: "K7PRO.jpg", correct: true },
-    { img: "KC.jpg", correct: true },
-    { img: "sock.jpg", correct: true },
-    { img: "M.jpg", correct: true },
-    { img: "G.jpg", correct: true }
-  ],
-  maxSelect: 9, // ✅ 改成 9
-  rewardPerCorrect: 5
+  reward: 10
 }
+
 ];
 
-  
-    // ============== 全局狀態 ==============
+  // ✅ 題庫分組（加在這裡）
+const questionGroups = {
+  round1: [0, 1, 2, 3, 4, 5, 6, 7],
+  round2: [8, 9, 10, 11, 12, 13, 14, 7],
+  round3: [15, 16, 17, 18, 19, 20, 21, 7],
+  round4: [22, 23, 24, 25, 26, 27, 28, 7]
+};
+// ✅ 全域變數區
+const MAX_ROUNDS = 4;
+const QUESTIONS_PER_ROUND = 8;
+const MAX_QUESTIONS = MAX_ROUNDS * QUESTIONS_PER_ROUND; //32
+const MAX_KCOIN = 320;
+
+let playedRounds = parseInt(localStorage.getItem("kombo_rounds") || "0");
+let totalQuestionsCompleted = parseInt(localStorage.getItem("kombo_questions") || "0");
+let igUsed = localStorage.getItem("kombo_ig") === "true";
+let fbUsed = localStorage.getItem("kombo_fb") === "true";
+   
+
+// ============== 全局狀態 ==============
     let kcoin = 0;                     // 剩餘 K 幣，一開始為 0
     let spent = 450;                   // 已花費 K 幣，一開始為 450
     const maxLevel = 5;
@@ -1446,31 +1522,30 @@ function savePlayedIndexes(indexes) {
 
     // 打開小遊戲：初始化第一關
  function openGame() {
-  const played = getPlayedIndexes();  // 拿已玩過題目
-
-  // 題庫 index 陣列（排除最後一題 KOMBO 收尾題）
-  const poolIndexes = [...Array(questionPool.length - 1).keys()];
-
-  // 從未玩過的題目中選出 7 題
-  const unused = poolIndexes.filter(i => !played.includes(i));
-  const selected = [];
-
-  // 如果未玩過題目 < 7 題，就混合已玩過的補足
-  if (unused.length >= 7) {
-    selected.push(...shuffle(unused).slice(0, 7));
-  } else {
-    selected.push(...shuffle(unused));
-    const stillNeed = 7 - unused.length;
-    const reused = shuffle(played).slice(0, stillNeed);
-    selected.push(...reused);
+  if (playedRounds >= MAX_ROUNDS) {
+    alert("你已完成所有遊戲（共 4 輪 / 32 題）🎉\n請使用你的 K 幣創造專屬技能卡！");
+    return;
   }
 
-  // 儲存本輪玩過的題目（扣掉 KOMBO 題）
-  savePlayedIndexes([...new Set([...played, ...selected])]);
+  // 根據目前輪數，對應題庫 key
+  const roundKey = `round${playedRounds + 1}`; // round1 ~ round4
+  const group = questionGroups[roundKey];
 
-  // 塞入這輪要用的題目（+收尾 KOMBO 題）
+  if (!group) {
+    alert("找不到第 " + (playedRounds + 1) + " 輪的題組！");
+    return;
+  }
+
+  // 隨機打亂該輪的前7題（不含固定的第8題）
+  const selected = shuffle(group.filter(id => id !== 7)).slice(0, 7);
   selectedRounds = selected.map(i => questionPool[i]);
-  selectedRounds.push(questionPool[questionPool.length - 1]); // 最後一題固定
+  selectedRounds.push(questionPool[7]); // 第8題固定為選KOMBO產品
+
+  // 更新進度狀態
+  // 更新進度狀態
+
+
+
 
   currentIndex = 0;
   totalEarned = 0;
@@ -1479,9 +1554,12 @@ function savePlayedIndexes(indexes) {
   igBtn.disabled = false;
   fbBtn.disabled = false;
   followButtons.style.display = "none";
+
   renderQuestion(selectedRounds[currentIndex]);
   gameModal.style.display = "flex";
 }
+
+
 
 // 小工具：隨機打亂陣列
 function shuffle(arr) {
@@ -1496,6 +1574,10 @@ function renderQuestion(q) {
   confirmBtn.disabled = true;
   gridContainer.innerHTML = "";
   selectedCount = 0;
+
+  // 加上進度更新：
+  document.getElementById("progressTracker").textContent =
+    `你已完成 ${totalQuestionsCompleted} / ${MAX_QUESTIONS} 題`;
 
   // 題目文字
   gameTitle.innerHTML = `第 ${currentIndex + 1} 題：${q.question}` + 
@@ -1661,8 +1743,21 @@ function renderQuestion(q) {
 function resetPlayedQuestions() {
   localStorage.removeItem("kombo_played");
   playedQuestionIndexes = [];
-  alert("✅ 已清除已玩過的題目，下一輪將重新隨機選題！");
+
+  // ✅ 新增：同步清除輪數、完成題數與 IG/FB 紀錄
+  localStorage.removeItem("kombo_rounds");
+  localStorage.removeItem("kombo_questions");
+  localStorage.removeItem("kombo_ig");
+  localStorage.removeItem("kombo_fb");
+
+  playedRounds = 0;
+  totalQuestionsCompleted = 0;
+  igUsed = false;
+  fbUsed = false;
+
+  alert("✅ 已清除所有進度，下一輪將重新開始!");
 }
+
      // 顯示正解 + 加分
     function confirmSelection() {
   const q = selectedRounds[currentIndex];
@@ -1730,7 +1825,15 @@ if (allCorrectSelected) {
     });
   }
 
+  // ✅ 若即將超過上限，就只給剩下能發的 K 幣
+if (kcoin + totalEarned + earned > MAX_KCOIN) {
+  earned = Math.max(0, MAX_KCOIN - kcoin - totalEarned);
+}
+
   totalEarned += earned;
+  totalQuestionsCompleted++;
+localStorage.setItem("kombo_questions", totalQuestionsCompleted);
+
   gameStatus.innerHTML = `
     <div class="reward-status">
        本題獲得 ${earned} K幣
@@ -1743,8 +1846,12 @@ if (allCorrectSelected) {
     currentIndex++;
     if (currentIndex < 8) {
       renderQuestion(selectedRounds[currentIndex]);
-    } else {
-       gameStatus.innerHTML = `以上皆是我們所販售的產品！<br>恭喜完成八關！共獲得 <strong>${totalEarned} K幣</strong><br>`;
+      } else {
+  // 👇 這裡加上：
+  playedRounds++;
+  localStorage.setItem("kombo_rounds", playedRounds);
+
+       gameStatus.innerHTML = `以上皆是我們所販售的產品！<br>恭喜完成本輪題目！共獲得 <strong>${totalEarned} K幣</strong><br>`;
       followButtons.style.display = "block";
     }
   }, 1200);
@@ -1753,39 +1860,66 @@ if (allCorrectSelected) {
 
     // IG 按鈕：只給一次 +50，並開新視窗到指定連結
     function followIG() {
-      if (!canFollowIG) return;
-      canFollowIG = false;
-      igBtn.disabled = true;
-      totalEarned += 50;
-      window.open(
-        "https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr",
-        "_blank"
-      );
-      gameStatus.textContent = `已追蹤 IG！額外獲得 50 K幣，總共 ${totalEarned} K幣`;
-    }
+  if (!igUsed && kcoin < MAX_KCOIN) {
+    igUsed = true;
+    localStorage.setItem("kombo_ig", "true");
+    const bonus = Math.min(50, MAX_KCOIN - kcoin);
+    totalEarned += bonus;
+    kcoin += bonus;
+    igBtn.disabled = true;
+    gameStatus.textContent = `已追蹤 IG！額外獲得 ${bonus} K幣，總共 ${totalEarned} K幣`;
+    window.open(
+      "https://www.instagram.com/kombo_2023?igsh=bGU4dGdia3F5NWM5&utm_source=qr",
+      "_blank"
+    );
+  }
+}
 
-    // FB 按鈕：只給一次 +50，並開新視窗到指定連結
     function followFB() {
-      if (!canFollowFB) return;
-      canFollowFB = false;
-      fbBtn.disabled = true;
-      totalEarned += 50;
-      window.open(
-        "https://www.facebook.com/share/19ZXhbVjJw/?mibextid=wwXIfr",
-        "_blank"
-      );
-      gameStatus.textContent = `已按讚 FB！額外獲得 50 K幣，總共 ${totalEarned} K幣`;
-    }
+  if (!fbUsed && kcoin < MAX_KCOIN) {
+    fbUsed = true;
+    localStorage.setItem("kombo_fb", "true");
+    const bonus = Math.min(50, MAX_KCOIN - kcoin);
+    totalEarned += bonus;
+    kcoin += bonus;
+    fbBtn.disabled = true;
+    gameStatus.textContent = `已按讚 FB！額外獲得 ${bonus} K幣，總共 ${totalEarned} K幣`;
+    window.open(
+      "https://www.facebook.com/share/19ZXhbVjJw/?mibextid=wwXIfr",
+      "_blank"
+    );
+  }
+}
+
 
     // 離開/關閉小遊戲
-    exitGameBtn.addEventListener("click", () => {
-      gameModal.style.display = "none";
-      // 將遊戲所得加到剩餘 K 幣，再更新畫面
-      kcoin += totalEarned;
-      document.getElementById("kcoin").textContent = kcoin;
-      enableUpgradeButtons();
-      renderAllMatchingCards();
-    });
+    // 離開 / 關閉小遊戲（新版：有扣回題數）
+exitGameBtn.addEventListener("click", () => {
+  // ✅ 如果這輪還沒完成（小於8題），把加進去的題數扣回來
+  if (currentIndex < selectedRounds.length) {
+    totalQuestionsCompleted -= currentIndex;
+    if (totalQuestionsCompleted < 0) totalQuestionsCompleted = 0;
+    localStorage.setItem("kombo_questions", totalQuestionsCompleted);
+  }
+
+  // ✅ 清除暫存中的遊戲資料，避免下次誤讀
+  localStorage.removeItem("kombo_in_progress");
+
+  // ✅ 重設標記
+  isCurrentGameOngoing = false;
+
+  // ✅ 關閉彈窗
+  gameModal.style.display = "none";
+
+  // ✅ 把這輪賺到的 K 幣加回主畫面
+  kcoin += totalEarned;
+  document.getElementById("kcoin").textContent = kcoin;
+
+  // ✅ 按鈕更新 / 產品推薦刷新
+  enableUpgradeButtons();
+  renderAllMatchingCards();
+});
+
 
     // 只有當玩家剩餘 K 幣 ≥ 10、且技能還沒滿，才解鎖升級按鈕
     function enableUpgradeButtons() {
